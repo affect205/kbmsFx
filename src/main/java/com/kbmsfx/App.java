@@ -18,6 +18,7 @@ import javafx.scene.web.HTMLEditor;
 import javafx.stage.Stage;
 
 public class App extends Application {
+
     private final String INITIAL_TEXT = "Lorem ipsum dolor sit "
             + "amet, consectetur adipiscing elit. Nam tortor felis, pulvinar "
             + "in scelerisque cursus, pulvinar at ante. Nulla consequat"
