@@ -5,19 +5,27 @@ package com.kbmsfx;
  * User: Alexey Balyschev
  * Date: 10.07.16
  */
+import com.kbmsfx.utils.CacheData;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Control;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTableView;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.HTMLEditor;
 import javafx.stage.Stage;
+import org.jboss.weld.environment.se.Weld;
+import org.jboss.weld.environment.se.WeldContainer;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class App extends Application {
+
+    @Inject
+    private CacheData dataProvider;
 
     private final String INITIAL_TEXT = "Lorem ipsum dolor sit "
             + "amet, consectetur adipiscing elit. Nam tortor felis, pulvinar "
@@ -29,8 +37,17 @@ public class App extends Application {
             + "aliquam sagittis gravida eu dolor. Etiam sit amet ipsum "
             + "sem.";
 
+    public static void main(String[] args) {
+        Weld weld = new Weld();
+        WeldContainer container = weld.initialize();
+        container.instance().select(App.class).get();
+        weld.shutdown();
+        Application.launch(App.class, args);
+    }
+
     @Override
     public void start(Stage stage) {
+
         stage.setTitle("HTML");
         stage.setWidth(500);
         stage.setHeight(500);
@@ -39,6 +56,7 @@ public class App extends Application {
         BorderPane root = new BorderPane();
         root.setCenter(buildCenter());
         root.setLeft(buildLeft());
+        root.setTop(buildTop());
         scene.setRoot(root);
 
         stage.setScene(scene);
@@ -74,8 +92,53 @@ public class App extends Application {
         return treeTableView;
     }
 
-    public static void main(String[] args) {
-        launch(args);
+    protected Control buildTop() {
+
+        MenuBar menuBar = new MenuBar();
+        //menuBar.prefWidthProperty().bind(primaryStage.widthProperty());
+
+        // File menu - new, save, exit
+        Menu fileMenu = new Menu("File");
+        MenuItem newMenuItem = new MenuItem("New");
+        MenuItem saveMenuItem = new MenuItem("Save");
+        MenuItem exitMenuItem = new MenuItem("Exit");
+        exitMenuItem.setOnAction(actionEvent -> Platform.exit());
+
+        fileMenu.getItems().addAll(newMenuItem, saveMenuItem,
+                new SeparatorMenuItem(), exitMenuItem);
+
+        Menu webMenu = new Menu("Web");
+        CheckMenuItem htmlMenuItem = new CheckMenuItem("HTML");
+        htmlMenuItem.setSelected(true);
+        webMenu.getItems().add(htmlMenuItem);
+
+        CheckMenuItem cssMenuItem = new CheckMenuItem("CSS");
+        cssMenuItem.setSelected(true);
+        webMenu.getItems().add(cssMenuItem);
+
+        Menu sqlMenu = new Menu("SQL");
+        ToggleGroup tGroup = new ToggleGroup();
+        RadioMenuItem mysqlItem = new RadioMenuItem("MySQL");
+        mysqlItem.setToggleGroup(tGroup);
+
+        RadioMenuItem oracleItem = new RadioMenuItem("Oracle");
+        oracleItem.setToggleGroup(tGroup);
+        oracleItem.setSelected(true);
+
+        sqlMenu.getItems().addAll(mysqlItem, oracleItem,
+                new SeparatorMenuItem());
+
+        Menu tutorialManeu = new Menu("Tutorial");
+        tutorialManeu.getItems().addAll(
+                new CheckMenuItem("Java"),
+                new CheckMenuItem("JavaFX"),
+                new CheckMenuItem("Swing"));
+
+        sqlMenu.getItems().add(tutorialManeu);
+
+        menuBar.getMenus().addAll(fileMenu, webMenu, sqlMenu);
+
+        return menuBar;
     }
 }
 
