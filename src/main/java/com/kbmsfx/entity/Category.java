@@ -1,38 +1,31 @@
 package com.kbmsfx.entity;
 
+import com.kbmsfx.enums.TreeKind;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Alex Balyschev
  * Date: 12.07.16
  */
-public class Category {
+public class Category extends TItem {
 
-    private int id;
-    private String name;
     private Category parent;
-    private int order;
+    private int sorting;
 
-    public Category(int id, String name, Category parent, int order) {
+    public Category(int id) {
+        this(id, "");
+    }
+
+    public Category(int id, String name) {
+        super(id, name, TreeKind.CATEGORY);
+    }
+
+    public Category(int id, String name, Category parent, int sorting) {
+        super(id, name, TreeKind.CATEGORY);
         this.id = id;
         this.name = name;
         this.parent = parent;
-        this.order = order;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+        this.sorting = sorting;
     }
 
     public Category getParent() {
@@ -43,11 +36,22 @@ public class Category {
         this.parent = parent;
     }
 
-    public int getOrder() {
-        return order;
+    public int getSorting() {
+        return sorting;
     }
 
-    public void setOrder(int order) {
-        this.order = order;
+    public void setSorting(int sorting) {
+        this.sorting = sorting;
+    }
+
+    @Override
+    public String toString() {
+        return "Category{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", kind=" + kind +
+                ", parent=" + (parent != null ? parent.getId() : "null") +
+                ", sorting=" + sorting +
+                '}';
     }
 }
