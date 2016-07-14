@@ -5,6 +5,8 @@ package com.kbmsfx;
  * User: Alexey Balyschev
  * Date: 10.07.16
  */
+import com.kbmsfx.entity.Category;
+import com.kbmsfx.entity.TItem;
 import com.kbmsfx.utils.CacheData;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -18,14 +20,20 @@ import javafx.stage.Stage;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.environment.se.WeldContainer;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.List;
 
 @Singleton
 public class App extends Application {
 
+    private static Stage currentStage;
+
     @Inject
     private CacheData dataProvider;
+
+    private static CacheData dataProvider2;
 
     private final String INITIAL_TEXT = "Lorem ipsum dolor sit "
             + "amet, consectetur adipiscing elit. Nam tortor felis, pulvinar "
@@ -38,19 +46,24 @@ public class App extends Application {
             + "sem.";
 
     public static void main(String[] args) {
+        System.out.print("init CDI container...");
         Weld weld = new Weld();
         WeldContainer container = weld.initialize();
         container.instance().select(App.class).get();
-        weld.shutdown();
         Application.launch(App.class, args);
+    }
+
+    @PostConstruct
+    public void init() {
+        if (dataProvider != null) dataProvider2 = dataProvider;
     }
 
     @Override
     public void start(Stage stage) {
-
-        stage.setTitle("HTML");
-        stage.setWidth(500);
-        stage.setHeight(500);
+        currentStage = stage;
+        currentStage.setTitle("HTML");
+        currentStage.setWidth(500);
+        currentStage.setHeight(500);
         Scene scene = new Scene(new Group());
 
         BorderPane root = new BorderPane();
@@ -59,8 +72,8 @@ public class App extends Application {
         root.setTop(buildTop());
         scene.setRoot(root);
 
-        stage.setScene(scene);
-        stage.show();
+        currentStage.setScene(scene);
+        currentStage.show();
     }
 
     protected Control buildCenter() {
@@ -72,22 +85,29 @@ public class App extends Application {
 
     protected Control buildLeft() {
 
-        TreeItem<String> childNode1 = new TreeItem<>("Node 1");
-        TreeItem<String> childNode2 = new TreeItem<>("Node 2");
-        TreeItem<String> childNode3 = new TreeItem<>("Node 3");
+        List<TreeItem<TItem>> treeData = dataProvider2.getTreeCache();
 
-        TreeItem<String> root = new TreeItem<>("Root");
+//        TreeItem<String> childNode1 = new TreeItem<>("Node 1");
+//        TreeItem<String> childNode2 = new TreeItem<>("Node 2");
+//        TreeItem<String> childNode3 = new TreeItem<>("Node 3");
+//
+//        TreeItem<String> root = new TreeItem<>("Root");
+//        root.setExpanded(true);
+//
+//        root.getChildren().setAll(childNode1, childNode2, childNode3);
+
+        TreeItem<TItem> root = new TreeItem<>(new Category(-1, "Scientia potentia est"));
         root.setExpanded(true);
 
-        root.getChildren().setAll(childNode1, childNode2, childNode3);
+        root.getChildren().addAll(treeData);
 
-        TreeTableColumn<String, String> column = new TreeTableColumn<>("Column");
+        TreeTableColumn<TItem, String> column = new TreeTableColumn<>("Column");
         column.setPrefWidth(150);
 
-        column.setCellValueFactory((TreeTableColumn.CellDataFeatures<String, String> p) -> new ReadOnlyStringWrapper(
-                p.getValue().getValue()));
+        column.setCellValueFactory((TreeTableColumn.CellDataFeatures<TItem, String> p) -> new ReadOnlyStringWrapper(
+                p.getValue().getValue().getName()));
 
-        TreeTableView<String> treeTableView = new TreeTableView<>(root);
+        TreeTableView<TItem> treeTableView = new TreeTableView<>(root);
         treeTableView.getColumns().add(column);
         return treeTableView;
     }

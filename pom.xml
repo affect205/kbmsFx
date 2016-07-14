@@ -17,7 +17,7 @@
                 <version>8.5.0</version>
                 <configuration>
                     <vendor>KBMSFX</vendor>
-                    <mainClass>com.kbmsfx.AppLoader</mainClass>
+                    <mainClass>com.kbmsfx.App</mainClass>
                 </configuration>
             </plugin>
 
