@@ -5,21 +5,18 @@ package com.kbmsfx;
  * User: Alexey Balyschev
  * Date: 10.07.16
  */
-import com.kbmsfx.entity.Category;
-import com.kbmsfx.entity.TItem;
+import com.kbmsfx.gui.component.CategoryTree;
 import com.kbmsfx.gui.component.DisplayPanel;
+import com.kbmsfx.gui.component.HDragboardPanel;
+import com.kbmsfx.gui.component.VDragboardPanel;
 import com.kbmsfx.utils.CacheData;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.geometry.Side;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.scene.web.HTMLEditor;
 import javafx.stage.Stage;
 import org.jboss.weld.environment.se.Weld;
@@ -29,7 +26,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Singleton
@@ -40,6 +36,15 @@ public class App extends Application {
 
     @Inject
     private DisplayPanel displayPanel;
+
+    @Inject
+    private CategoryTree categoryTree;
+
+    @Inject
+    HDragboardPanel hDragboardPanel;
+
+    @Inject
+    VDragboardPanel vDragboardPanel;
 
     private static  WeldContainer container;
 
@@ -64,7 +69,7 @@ public class App extends Application {
     @Override
     public void start(Stage stage) {
         stage.setTitle("HTML");
-        stage.setWidth(500);
+        stage.setWidth(1000);
         stage.setHeight(500);
         Scene scene = new Scene(new Group());
 
@@ -93,72 +98,18 @@ public class App extends Application {
         accordion.getPanes().addAll(t1, t2, t3);
         //accordion.setRotate(270);
 
-        MenuButton m = new MenuButton("Eats");
-        m.setPrefWidth(100);
-        m.setPopupSide(Side.LEFT);
-        m.getItems().addAll(new MenuItem("Burger"), new MenuItem("Hot Dog"));
-
-        MenuButton m2 = new MenuButton("Drinks");
-        m2.setPrefWidth(100);
-        m2.setPopupSide(Side.LEFT);
-        m2.getItems().addAll(new MenuItem("Juice"), new MenuItem("Milk"));
-
-        MenuButton m3 = new MenuButton("Eats");
-        m3.setPrefWidth(100);
-        m3.setPopupSide(Side.BOTTOM);
-        m3.getItems().addAll(new MenuItem("Burger"), new MenuItem("Hot Dog"));
-
-        MenuButton m4 = new MenuButton("Drinks");
-        m4.setPrefWidth(100);
-        m4.setPopupSide(Side.BOTTOM);
-        m4.getItems().addAll(new MenuItem("Juice"), new MenuItem("Milk"));
-
-        VBox right = new VBox();
-        right.getChildren().addAll(m, m2);
-
-        HBox top = new HBox();
-        top.getChildren().addAll(m3, m4);
-
-
         BorderPane center = new BorderPane();
         DisplayPanel dp = getBean(DisplayPanel.class);
         dp.getChildren().add(titledPane);
         center.setCenter(dp);
-        center.setRight(right);
-        center.setTop(top);
+        center.setRight(getBean(VDragboardPanel.class));
+        center.setTop(getBean(HDragboardPanel.class));
 
         return center;
     }
 
     protected Control buildLeft() {
-
-        CacheData dp = getBean(CacheData.class);
-        List<TreeItem<TItem>> treeData = dp.getTreeCache();
-
-//        TreeItem<String> childNode1 = new TreeItem<>("Node 1");
-//        TreeItem<String> childNode2 = new TreeItem<>("Node 2");
-//        TreeItem<String> childNode3 = new TreeItem<>("Node 3");
-//
-//        TreeItem<String> root = new TreeItem<>("Root");
-//        root.setExpanded(true);
-//
-//        root.getChildren().setAll(childNode1, childNode2, childNode3);
-
-        TreeItem<TItem> root = new TreeItem<>(new Category(-1, "Scientia potentia est"));
-        root.setExpanded(true);
-
-        root.getChildren().addAll(treeData);
-
-        TreeTableColumn<TItem, String> column = new TreeTableColumn<>("Categories");
-        column.setPrefWidth(200);
-        column.setResizable(true);
-
-        column.setCellValueFactory((TreeTableColumn.CellDataFeatures<TItem, String> p) -> new ReadOnlyStringWrapper(
-                p.getValue().getValue().getName()));
-
-        TreeTableView<TItem> treeTableView = new TreeTableView<>(root);
-        treeTableView.getColumns().add(column);
-        return treeTableView;
+        return getBean(CategoryTree.class);
     }
 
     protected Control buildTop() {
@@ -211,7 +162,7 @@ public class App extends Application {
     }
 
     public Set<Object> getAllBeans() {
-        return new HashSet<>(Arrays.asList(dataProvider, displayPanel));
+        return new HashSet<>(Arrays.asList(dataProvider, displayPanel, categoryTree, hDragboardPanel, vDragboardPanel));
     }
 
     public <T> T getBean(Class<T> type) {
