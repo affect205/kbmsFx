@@ -1,7 +1,10 @@
 package com.kbmsfx.gui.component;
 
 import com.kbmsfx.entity.Category;
+import com.kbmsfx.entity.Notice;
 import com.kbmsfx.entity.TItem;
+import com.kbmsfx.enums.TreeKind;
+import com.kbmsfx.events.NoticeEvent;
 import com.kbmsfx.utils.CacheData;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.scene.control.TreeItem;
@@ -13,6 +16,7 @@ import javafx.util.Callback;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
+import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
 /**
@@ -23,6 +27,9 @@ public class CategoryTree extends TreeTableView {
 
     @Inject
     private CacheData dataProvider;
+
+    @Inject
+    private Event<NoticeEvent> itemEvent;
 
     public CategoryTree() {
         super();
@@ -44,6 +51,15 @@ public class CategoryTree extends TreeTableView {
         setRoot(root);
         getColumns().add(column);
 
+        getSelectionModel().selectedItemProperty().addListener((observableValue, oldSelection, newSelection) -> {
+            if (TreeItem.class == newSelection.getClass()) {
+                TItem item = ((TreeItem<TItem>)newSelection).getValue();
+                if (item != null && TreeKind.NOTICE == item.getKind()) {
+                    Notice notice = dataProvider.getNoticeCache().get(item.getId());
+                    if (notice != null) itemEvent.fire(new NoticeEvent(notice));
+                }
+            }
+        });
 
         setRowFactory(new Callback<TreeTableView, TreeTableRow<TreeItem<TItem>>>() {
             @Override

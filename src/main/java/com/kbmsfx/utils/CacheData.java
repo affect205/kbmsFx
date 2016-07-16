@@ -116,4 +116,12 @@ public class CacheData {
     public List<TreeItem<TItem>> getTreeCache() {
         return treeCache;
     }
+
+    public Map<Integer, Category> getCategoryCache() {
+        return categoryCache;
+    }
+
+    public Map<Integer, Notice> getNoticeCache() {
+        return noticeCache;
+    }
 }
