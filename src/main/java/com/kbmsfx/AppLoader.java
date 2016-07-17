@@ -10,7 +10,6 @@ import com.kbmsfx.utils.CacheData;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import org.jboss.weld.environment.se.events.ContainerInitialized;
 
@@ -28,31 +27,20 @@ public class AppLoader {
     private CategoryTree categoryTree;
 
     @Inject
-    private HDragboardPanel hDragboardPanel;
-
-    @Inject
-    private VDragboardPanel vDragboardPanel;
-
-    @Inject
-    private DisplayContainer displayContainer;
+    private MainCenterPanel mainCenterPanel;
 
     public static void main(String[] args) {
-        System.out.print("launch javaFx...");
+        System.out.print("launch app...");
         Application.launch(App.class, args);
     }
 
     public void start(@Observes ContainerInitialized startEvent) {
-        System.out.print("start javaFx from container...");
+        System.out.print("start app from CDI container...");
         App.getInstance().start(this);
     }
 
     public Pane buildCenter() {
-        BorderPane center = new BorderPane();
-        displayContainer.setParent(center);
-        center.setCenter(displayContainer);
-        center.setRight(vDragboardPanel);
-        center.setTop(hDragboardPanel);
-        return center;
+        return mainCenterPanel;
     }
 
     public Control buildLeft() {
@@ -71,37 +59,7 @@ public class AppLoader {
         fileMenu.getItems().addAll(newMenuItem, saveMenuItem,
                 new SeparatorMenuItem(), exitMenuItem);
 
-        Menu webMenu = new Menu("Web");
-        CheckMenuItem htmlMenuItem = new CheckMenuItem("HTML");
-        htmlMenuItem.setSelected(true);
-        webMenu.getItems().add(htmlMenuItem);
-
-        CheckMenuItem cssMenuItem = new CheckMenuItem("CSS");
-        cssMenuItem.setSelected(true);
-        webMenu.getItems().add(cssMenuItem);
-
-        Menu sqlMenu = new Menu("SQL");
-        ToggleGroup tGroup = new ToggleGroup();
-        RadioMenuItem mysqlItem = new RadioMenuItem("MySQL");
-        mysqlItem.setToggleGroup(tGroup);
-
-        RadioMenuItem oracleItem = new RadioMenuItem("Oracle");
-        oracleItem.setToggleGroup(tGroup);
-        oracleItem.setSelected(true);
-
-        sqlMenu.getItems().addAll(mysqlItem, oracleItem,
-                new SeparatorMenuItem());
-
-        Menu tutorialManeu = new Menu("Tutorial");
-        tutorialManeu.getItems().addAll(
-                new CheckMenuItem("Java"),
-                new CheckMenuItem("JavaFX"),
-                new CheckMenuItem("Swing"));
-
-        sqlMenu.getItems().add(tutorialManeu);
-
-        menuBar.getMenus().addAll(fileMenu, webMenu, sqlMenu);
-
+        menuBar.getMenus().addAll(fileMenu);
         return menuBar;
     }
 }

@@ -27,7 +27,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) {
-        System.out.print("init javaFx...");
+        System.out.print("init app...");
         App.stage = stage;
         App.instance = this;
         System.out.print("init CDI container...");
@@ -36,7 +36,7 @@ public class App extends Application {
     }
 
     public void start(AppLoader loader) {
-        System.out.print("start javaFx...");
+        System.out.print("start app...");
         stage.setTitle("HTML");
         stage.setWidth(1000);
         stage.setHeight(500);

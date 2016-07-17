@@ -1,17 +1,19 @@
 package com.kbmsfx.gui.component;
 
 import com.kbmsfx.entity.Notice;
-import com.kbmsfx.events.NoticeEvent;
+import com.kbmsfx.events.UpdateEvent;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TitledPane;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.HTMLEditor;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
-import javax.enterprise.event.Observes;
+import javax.enterprise.event.Event;
+import javax.inject.Inject;
+import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,10 +24,12 @@ import java.util.stream.Collectors;
 @Dependent
 public class DisplayContainer extends VBox {
 
-    private List<TitledPane> noticeSet;
+    private List<TitledPane> noticeList;
     private Separator SEPARATOR;
-    private BorderPane parent;
     private VBox wrap;
+
+    @Inject
+    private Event<UpdateEvent> updateEvent;
 
     private final String INITIAL_TEXT = "Lorem ipsum dolor sit "
             + "amet, consectetur adipiscing elit. Nam tortor felis, pulvinar "
@@ -39,36 +43,37 @@ public class DisplayContainer extends VBox {
 
     public DisplayContainer() {
         super();
+        System.out.println("create DisplayContainer " + new Date().getTime());
         SEPARATOR = new Separator(Orientation.VERTICAL);
     }
 
     @PostConstruct
     protected void init() {
-        noticeSet = new LinkedList<>();
+        noticeList = new LinkedList<>();
 
         HTMLEditor htmlEditor = new HTMLEditor();
         htmlEditor.setPrefHeight(600);
         htmlEditor.setHtmlText(INITIAL_TEXT);
         TitledPane titledPane = new TitledPane("HTML editor", htmlEditor);
         titledPane.setId("n.0");
-        noticeSet.add(titledPane);
+        noticeList.add(titledPane);
 
         wrap = new VBox(titledPane, SEPARATOR);
 
         getChildren().setAll(wrap);
     }
 
-    public void noticeSelected(@Observes NoticeEvent event) {
-        Notice notice = event.getNotice();
-        System.out.println(String.format("noticeSelected - id: %s....", event.getNotice().getId()));
+    public void setNotice(Notice notice) {
+        if (notice == null) return;
+        collapseAll();
         TitledPane titledPane = buildEditPanel(notice);
-        noticeSet = noticeSet.stream()
-                .filter(n -> !n.getId().equals(notice.getId()))
+        noticeList = noticeList.stream()
+                .filter(n -> !n.getId().equals("n." + notice.getId()))
                 .collect(Collectors.toList());
-        noticeSet.add(titledPane);
-
+        noticeList.add(titledPane);
+        Collections.reverse(noticeList);
         getChildren().setAll(buildWrap());
-        if (parent != null) parent.setCenter(this);
+        updateRootPanel();
     }
 
     protected TitledPane buildEditPanel(Notice notice) {
@@ -82,12 +87,16 @@ public class DisplayContainer extends VBox {
 
     protected VBox buildWrap() {
         wrap.getChildren().clear();
-        wrap.getChildren().setAll(noticeSet);
+        wrap.getChildren().setAll(noticeList);
         wrap.getChildren().add(SEPARATOR);
         return wrap;
     }
 
-    public void setParent(BorderPane parent) {
-        this.parent = parent;
+    protected void updateRootPanel() {
+        updateEvent.fire(new UpdateEvent(DisplayContainer.class));
+    }
+
+    protected void collapseAll() {
+        noticeList.forEach(c-> c.setExpanded(false));
     }
 }
