@@ -41,11 +41,11 @@
             <version>1.2.2</version>
         </dependency>
 
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>log4j</groupId>-->
+            <!--<artifactId>log4j</artifactId>-->
+            <!--<version>1.2.17</version>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>org.xerial</groupId>
@@ -70,9 +70,45 @@
             <version>1.2</version>
         </dependency>
 
+        <!-- JDBC драйвер для кассандры -->
+        <!--<dependency>-->
+            <!--<groupId>org.apache-extras.cassandra-jdbc</groupId>-->
+            <!--<artifactId>cassandra-jdbc</artifactId>-->
+            <!--<version>1.2.1</version>-->
+        <!--</dependency>-->
+
+        <!-- DataStax драйвер для кассандры -->
+        <dependency>
+            <groupId>com.datastax.cassandra</groupId>
+            <artifactId>cassandra-driver-core</artifactId>
+            <version>3.0.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.datastax.cassandra</groupId>
+            <artifactId>cassandra-driver-mapping</artifactId>
+            <version>3.0.3</version>
+        </dependency>
 
 
 
+        <!-- https://mvnrepository.com/artifact/com.datastax.cassandra/cassandra-driver-extras -->
+        <dependency>
+            <groupId>com.datastax.cassandra</groupId>
+            <artifactId>cassandra-driver-extras</artifactId>
+            <version>3.0.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.5</version>
+        </dependency>
     </dependencies>
 
 </project>

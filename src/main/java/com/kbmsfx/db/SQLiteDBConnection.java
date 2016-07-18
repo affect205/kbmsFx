@@ -2,10 +2,8 @@ package com.kbmsfx.db;
 
 import org.sqlite.SQLiteConfig;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Singleton;
 import java.sql.*;
-import java.util.Properties;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,7 +11,7 @@ import java.util.Properties;
  * Date: 11.07.16
  */
 @Singleton
-public class DBConnection {
+public class SQLiteDBConnection implements IDBConnection {
 
     private Connection conn;
     private SQLiteConfig config;
@@ -21,16 +19,12 @@ public class DBConnection {
     private static final String JDBC_SQLLITE_URI =  "jdbc:sqlite::resource:";
     private static final String KBMS_DB = "kbmsdb.s3db";
 
-    public DBConnection() throws Exception {
+    public SQLiteDBConnection() throws Exception {
+        System.out.println("init SQLiteDBConnection...");
         Class.forName("org.sqlite.JDBC");
     }
 
-    @PostConstruct
-    public void init() throws Exception {
-        conn = createConnection();
-        System.out.println("Connection has been established...");
-    }
-
+    @Override
     public void initializeDB() throws Exception {
         Statement statmt = conn.createStatement();
         statmt.execute("CREATE TABLE [category] (\n" +
@@ -50,6 +44,7 @@ public class DBConnection {
         System.out.println("All tables has been initialized...");
     }
 
+    @Override
     public Connection getConnection() throws Exception {
         if (conn == null || conn.isClosed()) return createConnection();
         return conn;

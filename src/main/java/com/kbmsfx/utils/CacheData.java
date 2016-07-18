@@ -1,6 +1,6 @@
 package com.kbmsfx.utils;
 
-import com.kbmsfx.dao.DataProvider;
+import com.kbmsfx.dao.IDataProvider;
 import com.kbmsfx.dto.CategoryDTO;
 import com.kbmsfx.dto.NoticeDTO;
 import com.kbmsfx.entity.Category;
@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -29,7 +28,7 @@ import java.util.stream.Collectors;
 public class CacheData {
 
     @Inject
-    DataProvider dataProvider;
+    IDataProvider dataProvider;
 
     Map<Integer, Category> categoryCache;
     Map<Integer, Notice> noticeCache;

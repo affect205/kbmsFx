@@ -1,17 +1,16 @@
 package com.kbmsfx.dao;
 
-import com.kbmsfx.db.DBConnection;
+import com.kbmsfx.db.CassandraDBConnection;
+import com.kbmsfx.db.SQLiteDBConnection;
 import com.kbmsfx.dto.CategoryDTO;
 import com.kbmsfx.dto.NoticeDTO;
-import com.kbmsfx.entity.Category;
-import com.kbmsfx.entity.Notice;
 import com.kbmsfx.utils.DBUtils;
 
 import javax.enterprise.context.Dependent;
+import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,16 +20,19 @@ import java.util.List;
  * Date: 11.07.16
  */
 @Dependent
-public class DataProvider {
+@Alternative
+public class SqlDataProvider implements IDataProvider {
 
     @Inject
-    DBConnection dbConn;
+    SQLiteDBConnection dbConn;
 
-    public void getCategoryTree() {
-        System.out.println("I do something...");
+    @Override
+    public void addNotice(NoticeDTO notice) throws Exception {
+        System.out.println("addNotice....");
     }
 
-    public void addCategory() throws Exception {
+    @Override
+    public void addCategory(CategoryDTO category) throws Exception {
         System.out.println("addCategory....");
         Statement stmt = null;
         try {
@@ -41,6 +43,7 @@ public class DataProvider {
         }
     }
 
+    @Override
     public List<CategoryDTO> getCategoryList() throws Exception {
         System.out.println("getCategoryList....");
         List<CategoryDTO> result = new LinkedList<>();
@@ -57,6 +60,7 @@ public class DataProvider {
         }
     }
 
+    @Override
     public List<NoticeDTO> getNoticeList() throws Exception {
         System.out.println("getNoticeList....");
         List<NoticeDTO> result = new LinkedList<>();
