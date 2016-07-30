@@ -96,6 +96,7 @@ public class CacheData {
     }
 
     public void editTreeItem(TItem item) {
+        System.out.println("editTreeItem....");
         if (item == null) return;
         try {
             if (item.getKind() == TreeKind.CATEGORY) {
@@ -115,6 +116,18 @@ public class CacheData {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public int addTreeItem(TItem item) throws Exception {
+        System.out.println("addTreeItem....");
+        int recId = -1;
+        if (item == null) return -1;
+        if (item.getKind() == TreeKind.CATEGORY) {
+            recId = dataProvider.addCategory(EntityUtils.toCategoryDTO(item));
+        } else if (item.getKind() == TreeKind.NOTICE) {
+            recId = dataProvider.addNotice(EntityUtils.toNoticeDTO(item));
+        }
+        return recId;
     }
 
     protected void updateCategoryCache() throws Exception {

@@ -24,14 +24,22 @@ public class CassandraDataProvider implements IDataProvider {
     CassandraDBConnection casDbConn;
 
     @Override
-    public void addNotice(NoticeDTO notice) throws Exception {
+    public int addNotice(NoticeDTO notice) throws Exception {
         System.out.println("addNotice....");
+        return -1;
     }
 
     @Override
-    public void addCategory(CategoryDTO category) throws Exception {
+    public int addCategory(CategoryDTO category) throws Exception {
         System.out.println("addCategory....");
+        return -1;
     }
+
+    @Override
+    public void deleteCategory(int id) throws Exception {}
+
+    @Override
+    public void deleteNotice(int id) throws Exception {}
 
     @Override
     public List<CategoryDTO> getCategoryList() throws Exception {

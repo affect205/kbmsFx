@@ -2,13 +2,11 @@ package com.kbmsfx.gui.component;
 
 import com.kbmsfx.events.RefreshTreeEvent;
 import com.kbmsfx.events.SelectedEvent;
-import javafx.geometry.Insets;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.event.Observes;
-import javax.enterprise.inject.New;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -31,6 +29,7 @@ public class LeftPanel extends VBox {
     @PostConstruct
     protected void init() {
         getChildren().setAll(treeEditPanel, categoryTree);
+        VBox.setVgrow(categoryTree, Priority.ALWAYS);
     }
 
     public void selectedItem(@Observes SelectedEvent event) {

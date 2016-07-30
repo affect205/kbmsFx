@@ -27,17 +27,67 @@ public class SqlDataProvider implements IDataProvider {
     SQLiteDBConnection dbConn;
 
     @Override
-    public void addNotice(NoticeDTO notice) throws Exception {
+    public int addNotice(NoticeDTO notice) throws Exception {
         System.out.println("addNotice....");
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            stmt = dbConn.getConnection().prepareStatement(
+                    " INSERT INTO notice (name, content, categoryid, sorting) VALUES (?, ?, ?, ?); " +
+                    " SELECT last_insert_rowid(); ");
+            stmt.setString(1, notice.getName());
+            stmt.setString(2, notice.getContent());
+            stmt.setInt(3, notice.getCategoryid());
+            stmt.setInt(4, notice.getSorting());
+            stmt.execute();
+            rs = dbConn.getConnection().createStatement().executeQuery("SELECT max(id) AS id FROM notice;");
+            return rs.next() ? rs.getInt("id") : -1;
+        } finally {
+            DBUtils.close(rs);
+            DBUtils.close(stmt);
+        }
     }
 
     @Override
-    public void addCategory(CategoryDTO category) throws Exception {
+    public int addCategory(CategoryDTO category) throws Exception {
         System.out.println("addCategory....");
-        Statement stmt = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
         try {
-            stmt = dbConn.getConnection().createStatement();
-            stmt.execute("INSERT INTO category ('name', 'order', 'parent') VALUES ('тестовая запись2', 1, 1); ");
+            stmt = dbConn.getConnection().prepareStatement("INSERT INTO category (name, parent, sorting) VALUES(?, ?, ?)");
+            stmt.setString(1, category.getName());
+            stmt.setInt(2, category.getParent());
+            stmt.setInt(3, category.getSorting());
+            stmt.execute();
+            rs = dbConn.getConnection().createStatement().executeQuery("SELECT max(id) AS id FROM category;");
+            return rs.next() ? rs.getInt("id") : -1;
+        } finally {
+            DBUtils.close(rs);
+            DBUtils.close(stmt);
+        }
+    }
+
+    @Override
+    public void deleteCategory(int id) throws Exception {
+        System.out.println("deleteCategory....");
+        PreparedStatement stmt = null;
+        try {
+            stmt = dbConn.getConnection().prepareStatement("DELETE FROM category WHERE id = ?");
+            stmt.setInt(1, id);
+            stmt.execute();
+        } finally {
+            DBUtils.close(stmt);
+        }
+    }
+
+    @Override
+    public void deleteNotice(int id) throws Exception {
+        System.out.println("deleteNotice....");
+        PreparedStatement stmt = null;
+        try {
+            stmt = dbConn.getConnection().prepareStatement("DELETE FROM notice WHERE id = ?");
+            stmt.setInt(1, id);
+            stmt.execute();
         } finally {
             DBUtils.close(stmt);
         }

@@ -5,13 +5,10 @@ import com.kbmsfx.entity.Notice;
 import com.kbmsfx.entity.TItem;
 import com.kbmsfx.enums.TreeKind;
 import com.kbmsfx.events.NoticeEvent;
-import com.kbmsfx.events.RefreshTreeEvent;
 import com.kbmsfx.events.SelectedEvent;
 import com.kbmsfx.utils.CacheData;
-import javafx.beans.binding.Bindings;
+import com.kbmsfx.utils.EntityUtils;
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.util.Callback;
@@ -19,10 +16,7 @@ import javafx.util.Callback;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.List;
 
 /**
  * Created by Alex on 15.07.2016.
@@ -41,26 +35,51 @@ public class CategoryTree extends TreeTableView {
 
     private TreeItem<TItem> root;
 
-    private MenuItem addMenuItem;
+    private MenuItem addCatMenuItem;
+    private MenuItem addNotMenuItem;
     private MenuItem removeMenuItem;
     private ContextMenu contextMenu;
 
     public CategoryTree() {
         super();
         contextMenu = new ContextMenu();
-        addMenuItem = new MenuItem("+ Добавить");
-        removeMenuItem = new MenuItem("- Удалить");
-        addMenuItem.setOnAction(event -> {
-            System.out.println("add item...");
+        addCatMenuItem = new MenuItem("+ Добавить категорию");
+        addCatMenuItem.setOnAction(event -> {
+            System.out.println("add category...");
             TreeItem<TItem> selected = (TreeItem<TItem>)getSelectionModel().getSelectedItem();
-            System.out.println(selected.getValue());
+            if (selected.getValue() == null) return;
+            TItem parent = selected.getValue();
+            if (parent.getKind() != TreeKind.CATEGORY) return;
+            Category newCategory = EntityUtils.createCategory((Category)parent);
+            try {
+                int recId = dataProvider.addTreeItem(newCategory);
+                if (recId < 1) return;
+                newCategory.setId(recId);
+                selected.getChildren().add(new TreeItem<>(newCategory));
+            } catch (Exception e) { e.printStackTrace(); }
         });
+        addNotMenuItem = new MenuItem("+ Добавить запись");
+        addNotMenuItem.setOnAction(event -> {
+            System.out.println("add notice...");
+            TreeItem<TItem> selected = (TreeItem<TItem>)getSelectionModel().getSelectedItem();
+            if (selected.getValue() == null) return;
+            TItem parent = selected.getValue();
+            if (parent.getKind() != TreeKind.CATEGORY) return;
+            Notice newNotice = EntityUtils.createNotice((Category)parent);
+            try {
+                int recId = dataProvider.addTreeItem(newNotice);
+                if (recId < 1) return;
+                newNotice.setId(recId);
+                selected.getChildren().add(new TreeItem<>(newNotice));
+            } catch (Exception e) { e.printStackTrace(); }
+        });
+        removeMenuItem = new MenuItem("- Удалить");
         removeMenuItem.setOnAction(event -> {
             System.out.println("remove item...");
             TreeItem<TItem> selected = (TreeItem<TItem>)getSelectionModel().getSelectedItem();
             System.out.println(selected.getValue());
         });
-        contextMenu.getItems().setAll(addMenuItem, removeMenuItem);
+        contextMenu.getItems().setAll(addCatMenuItem, addNotMenuItem, removeMenuItem);
         setContextMenu(contextMenu);
     }
 
@@ -70,8 +89,9 @@ public class CategoryTree extends TreeTableView {
         root.setExpanded(true);
         root.getChildren().addAll(dataProvider.getTreeCache());
         setRoot(root);
+        setShowRoot(false);
 
-        TreeTableColumn<TItem, String> column = new TreeTableColumn<>("Categories");
+        TreeTableColumn<TItem, String> column = new TreeTableColumn<>("Дерево знаний");
         column.setPrefWidth(280);
         column.setResizable(true);
         column.setCellValueFactory((TreeTableColumn.CellDataFeatures<TItem, String> p) -> new ReadOnlyStringWrapper(
@@ -90,7 +110,8 @@ public class CategoryTree extends TreeTableView {
                 if (item != null) {
                     selectedEvent.fire(new SelectedEvent(item));
                 }
-                addMenuItem.setVisible(item.getKind() == TreeKind.CATEGORY);
+                addCatMenuItem.setVisible(item.getKind() == TreeKind.CATEGORY);
+                addNotMenuItem.setVisible(item.getKind() == TreeKind.CATEGORY);
             }
         });
 
