@@ -46,6 +46,7 @@ public class CategoryTree extends TreeTableView {
 
     @PostConstruct
     public void init() {
+
         root = new TreeItem<>(new Category(-1, "Scientia potentia est"));
         root.setExpanded(true);
         root.getChildren().addAll(dataProvider.getTreeCache());
