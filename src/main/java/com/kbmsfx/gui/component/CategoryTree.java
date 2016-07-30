@@ -8,11 +8,11 @@ import com.kbmsfx.events.NoticeEvent;
 import com.kbmsfx.events.RefreshTreeEvent;
 import com.kbmsfx.events.SelectedEvent;
 import com.kbmsfx.utils.CacheData;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTableRow;
-import javafx.scene.control.TreeTableView;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.util.Callback;
 
@@ -22,6 +22,7 @@ import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.List;
 
 /**
  * Created by Alex on 15.07.2016.
@@ -40,13 +41,31 @@ public class CategoryTree extends TreeTableView {
 
     private TreeItem<TItem> root;
 
+    private MenuItem addMenuItem;
+    private MenuItem removeMenuItem;
+    private ContextMenu contextMenu;
+
     public CategoryTree() {
         super();
+        contextMenu = new ContextMenu();
+        addMenuItem = new MenuItem("+ Добавить");
+        removeMenuItem = new MenuItem("- Удалить");
+        addMenuItem.setOnAction(event -> {
+            System.out.println("add item...");
+            TreeItem<TItem> selected = (TreeItem<TItem>)getSelectionModel().getSelectedItem();
+            System.out.println(selected.getValue());
+        });
+        removeMenuItem.setOnAction(event -> {
+            System.out.println("remove item...");
+            TreeItem<TItem> selected = (TreeItem<TItem>)getSelectionModel().getSelectedItem();
+            System.out.println(selected.getValue());
+        });
+        contextMenu.getItems().setAll(addMenuItem, removeMenuItem);
+        setContextMenu(contextMenu);
     }
 
     @PostConstruct
     public void init() {
-
         root = new TreeItem<>(new Category(-1, "Scientia potentia est"));
         root.setExpanded(true);
         root.getChildren().addAll(dataProvider.getTreeCache());
@@ -71,6 +90,7 @@ public class CategoryTree extends TreeTableView {
                 if (item != null) {
                     selectedEvent.fire(new SelectedEvent(item));
                 }
+                addMenuItem.setVisible(item.getKind() == TreeKind.CATEGORY);
             }
         });
 
@@ -79,6 +99,7 @@ public class CategoryTree extends TreeTableView {
             public TreeTableRow<TreeItem<TItem>> call(final TreeTableView param) {
                 final TreeTableRow<TreeItem<TItem>> row = new TreeTableRow<>();
 
+                // Drag and Drop
                 row.setOnDragDetected(event -> {
                     TreeItem<TItem> selected = (TreeItem<TItem>) getSelectionModel().getSelectedItem();
                     if (selected != null) {
@@ -111,6 +132,7 @@ public class CategoryTree extends TreeTableView {
                     event.setDropCompleted(success);
                     event.consume();
                 });
+
                 return row;
             }
         });
