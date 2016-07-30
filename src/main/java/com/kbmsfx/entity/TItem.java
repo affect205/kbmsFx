@@ -71,4 +71,9 @@ public abstract class TItem {
         result = 31 * result + getKind().hashCode();
         return result;
     }
+
+    public boolean baseEquals(TItem item) {
+        if (item == null) return false;
+        return id == item.getId() && kind == item.getKind();
+    }
 }

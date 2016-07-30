@@ -15,4 +15,6 @@ public interface IDataProvider {
     void addNotice(NoticeDTO notice) throws Exception;
     List<CategoryDTO> getCategoryList() throws Exception;
     List<NoticeDTO> getNoticeList() throws Exception;
+    void updateCategory(CategoryDTO category) throws Exception;
+    void updateNotice(NoticeDTO notice) throws Exception;
 }

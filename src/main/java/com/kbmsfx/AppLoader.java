@@ -24,18 +24,18 @@ public class AppLoader {
     private CacheData dataProvider;
 
     @Inject
-    private CategoryTree categoryTree;
+    private LeftPanel leftPanel;
 
     @Inject
     private MainCenterPanel mainCenterPanel;
 
     public static void main(String[] args) {
-        System.out.print("launch app...");
+        System.out.println("launch app...");
         Application.launch(App.class, args);
     }
 
     public void start(@Observes ContainerInitialized startEvent) {
-        System.out.print("start app from CDI container...");
+        System.out.println("start app from CDI container...");
         App.getInstance().start(this);
     }
 
@@ -43,8 +43,8 @@ public class AppLoader {
         return mainCenterPanel;
     }
 
-    public Control buildLeft() {
-        return categoryTree;
+    public Pane buildLeft() {
+        return leftPanel;
     }
 
     public Control buildTop() {

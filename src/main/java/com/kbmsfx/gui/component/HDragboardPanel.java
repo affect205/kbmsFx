@@ -2,6 +2,7 @@ package com.kbmsfx.gui.component;
 
 import com.kbmsfx.entity.TItem;
 import com.kbmsfx.enums.TreeKind;
+import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuButton;
@@ -10,6 +11,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
@@ -30,6 +32,8 @@ public class HDragboardPanel extends HBox {
     public HDragboardPanel() {
         super();
         setMinHeight(30);
+        setPadding(new Insets(10));
+        HBox.setMargin(this, new Insets(10, 0, 10, 0));
     }
 
     @PostConstruct
@@ -40,7 +44,7 @@ public class HDragboardPanel extends HBox {
         m3.setPrefWidth(100);
         m3.setPopupSide(Side.BOTTOM);
         m3.getItems().addAll(new MenuItem("Burger"), new MenuItem("Hot Dog"), new Menu(""));
-
+        getChildren().setAll(m3);
 
         setOnDragDetected(event -> {
             event.consume();

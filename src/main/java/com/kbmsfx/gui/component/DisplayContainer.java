@@ -2,16 +2,29 @@ package com.kbmsfx.gui.component;
 
 import com.kbmsfx.entity.Notice;
 import com.kbmsfx.events.UpdateEvent;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.HPos;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TitledPane;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.web.HTMLEditor;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
@@ -25,7 +38,6 @@ import java.util.stream.Collectors;
 public class DisplayContainer extends VBox {
 
     private List<TitledPane> noticeList;
-    private Separator SEPARATOR;
     private VBox wrap;
 
     @Inject
@@ -43,8 +55,8 @@ public class DisplayContainer extends VBox {
 
     public DisplayContainer() {
         super();
+        this.setAlignment(Pos.TOP_CENTER);
         System.out.println("create DisplayContainer " + new Date().getTime());
-        SEPARATOR = new Separator(Orientation.VERTICAL);
     }
 
     @PostConstruct
@@ -58,9 +70,12 @@ public class DisplayContainer extends VBox {
         titledPane.setId("n.0");
         noticeList.add(titledPane);
 
-        wrap = new VBox(titledPane, SEPARATOR);
+        wrap = new VBox(titledPane);
+        VBox.setMargin(wrap, new Insets(10, 10, 0, 10));
+        HBox topToolbar = buildTopToolbar();
 
-        getChildren().setAll(wrap);
+        getChildren().add(topToolbar);
+        getChildren().add(wrap);
     }
 
     public void setNotice(Notice notice) {
@@ -88,7 +103,6 @@ public class DisplayContainer extends VBox {
     protected VBox buildWrap() {
         wrap.getChildren().clear();
         wrap.getChildren().setAll(noticeList);
-        wrap.getChildren().add(SEPARATOR);
         return wrap;
     }
 
@@ -98,5 +112,16 @@ public class DisplayContainer extends VBox {
 
     protected void collapseAll() {
         noticeList.forEach(c-> c.setExpanded(false));
+    }
+
+    protected HBox buildTopToolbar() {
+        Button saveBtn = new Button("Save");
+        saveBtn.setOnAction(actionEvent -> {
+            System.out.println("Save notice...");
+        });
+        HBox topToolbar = new HBox(saveBtn);
+        topToolbar.setAlignment(Pos.BASELINE_RIGHT);
+        VBox.setMargin(topToolbar, new Insets(0, 10, 0, 10));
+        return topToolbar;
     }
 }

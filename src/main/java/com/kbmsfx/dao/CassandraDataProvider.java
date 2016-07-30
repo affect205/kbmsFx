@@ -64,4 +64,14 @@ public class CassandraDataProvider implements IDataProvider {
         }
         return result;
     }
+
+    @Override
+    public void updateCategory(CategoryDTO category) throws Exception {
+
+    }
+
+    @Override
+    public void updateNotice(NoticeDTO notice) throws Exception {
+
+    }
 }

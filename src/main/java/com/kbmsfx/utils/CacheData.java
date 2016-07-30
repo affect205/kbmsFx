@@ -34,51 +34,15 @@ public class CacheData {
     Map<Integer, Notice> noticeCache;
     List<TreeItem<TItem>> treeCache;
 
-    public CacheData() {
-
-    }
+    public CacheData() {}
 
     @PostConstruct
     public void init() throws Exception {
         System.out.println("init CacheData...");
-
-        List<NoticeDTO> noticeDTOs = dataProvider.getNoticeList();
-        List<CategoryDTO> categoryDTOs = dataProvider.getCategoryList();
-
-        categoryCache = new HashMap<>();
-        categoryDTOs.forEach(dto -> {
-            categoryCache.put(dto.getId(), new Category(dto.getId(), dto.getName(), dto.getParent() > 0 ? new Category(dto.getParent()) : null, dto.getSorting()));
-        });
-
-        noticeCache = new HashMap<>();
-        noticeDTOs.forEach(dto -> {
-            noticeCache.put(dto.getId(), new Notice(dto.getId(), dto.getName(), dto.getContent(), new Category(dto.getCategoryid()), dto.getSorting()));
-        });
-
-        System.out.println("Categories....");
-        categoryCache.keySet().forEach(key -> {
-            Category category = categoryCache.get(key);
-            if (category.getParent() != null) category.setParent(categoryCache.get(category.getParent().getId()));
-            System.out.println(category.toString());
-        });
-
-        System.out.println("Notices....");
-        noticeCache.keySet().forEach(key -> {
-            Notice notice = noticeCache.get(key);
-            if (notice.getCategory() != null) notice.setCategory(categoryCache.get(notice.getCategory().getId()));
-            System.out.println(notice.toString());
-        });
-
-        System.out.println("Tree cache....");
-        List<TItem> nodeList = new LinkedList<TItem>(){{
-            addAll(categoryCache.values());
-            addAll(noticeCache.values());
-        }};
-        treeCache = getItemChildren(nodeList, null);
-        treeCache.forEach(c -> printTree(c));
+        updateCategoryCache();
+        updateNoticeCache();
+        updateTreeCache();
     }
-
-
 
     private List<TreeItem<TItem>> getItemChildren(List<TItem> items, TItem parent) {
         if (parent != null && parent.getKind() != TreeKind.CATEGORY) return new LinkedList<>();
@@ -98,7 +62,14 @@ public class CacheData {
             return false;
         };
 
-        List<TreeItem<TItem>> children = items.stream().filter(p::test).map(TreeItem::new).collect(Collectors.toList());
+        List<TreeItem<TItem>> children = items.stream()
+                .filter(p::test)
+                .map(item -> {
+                    TreeItem<TItem> ti = new TreeItem<>(item);
+                    if (item.getKind() == TreeKind.CATEGORY) ti.setExpanded(true);
+                    return ti;
+                })
+                .collect(Collectors.toList());
         children.forEach(item -> {
             item.getChildren().setAll(getItemChildren(items, item.getValue()));
         });
@@ -122,5 +93,86 @@ public class CacheData {
 
     public Map<Integer, Notice> getNoticeCache() {
         return noticeCache;
+    }
+
+    public void editTreeItem(TItem item) {
+        if (item == null) return;
+        try {
+            if (item.getKind() == TreeKind.CATEGORY) {
+                dataProvider.updateCategory(EntityUtils.toCategoryDTO(item));
+                if (categoryCache.containsKey(item.getId())) {
+                    categoryCache.put(item.getId(), (Category)item);
+                    updateTreeCache(treeCache, item);
+                }
+
+            } else if (item.getKind() == TreeKind.NOTICE) {
+                dataProvider.updateNotice(EntityUtils.toNoticeDTO(item));
+                if (noticeCache.containsKey(item.getId())) {
+                    noticeCache.put(item.getId(), (Notice)item);
+                    updateTreeCache(treeCache, item);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected void updateCategoryCache() throws Exception {
+        System.out.println("Update categories....");
+
+        List<CategoryDTO> categoryDTOs = dataProvider.getCategoryList();
+        categoryCache = new HashMap<>();
+        categoryDTOs.forEach(dto -> {
+            categoryCache.put(dto.getId(), new Category(dto.getId(), dto.getName(), dto.getParent() > 0 ? new Category(dto.getParent()) : null, dto.getSorting()));
+        });
+
+        categoryCache.keySet().forEach(key -> {
+            Category category = categoryCache.get(key);
+            if (category.getParent() != null) category.setParent(categoryCache.get(category.getParent().getId()));
+            System.out.println(category.toString());
+        });
+    }
+
+    protected void updateNoticeCache() throws Exception {
+        List<NoticeDTO> noticeDTOs = dataProvider.getNoticeList();
+        noticeCache = new HashMap<>();
+        noticeDTOs.forEach(dto -> {
+            noticeCache.put(dto.getId(), new Notice(dto.getId(), dto.getName(), dto.getContent(), new Category(dto.getCategoryid()), dto.getSorting()));
+        });
+
+        System.out.println("Update notices....");
+        noticeCache.keySet().forEach(key -> {
+            Notice notice = noticeCache.get(key);
+            if (notice.getCategory() != null) notice.setCategory(categoryCache.get(notice.getCategory().getId()));
+            System.out.println(notice.toString());
+        });
+    }
+
+    protected void updateTreeCache() throws Exception {
+        System.out.println("Update tree cache....");
+        List<TItem> nodeList = new LinkedList<TItem>(){{
+            addAll(categoryCache.values());
+            addAll(noticeCache.values());
+        }};
+        treeCache = getItemChildren(nodeList, null);
+        treeCache.forEach(c -> printTree(c));
+    }
+
+    protected void updateTreeCache(List<TreeItem<TItem>> tree, TItem item) throws Exception {
+        if (item == null) return;
+        tree.forEach(ti -> {
+            TItem value = ti.getValue();
+            if (value.baseEquals(item)) {
+                ti.setValue(item);
+                System.out.printf("Tree item %s has changed\n", item.getId());
+                return;
+            } else {
+                try {
+                    updateTreeCache(ti.getChildren(), item);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }

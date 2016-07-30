@@ -1,6 +1,5 @@
 package com.kbmsfx.dao;
 
-import com.kbmsfx.db.CassandraDBConnection;
 import com.kbmsfx.db.SQLiteDBConnection;
 import com.kbmsfx.dto.CategoryDTO;
 import com.kbmsfx.dto.NoticeDTO;
@@ -9,6 +8,7 @@ import com.kbmsfx.utils.DBUtils;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.LinkedList;
@@ -74,6 +74,48 @@ public class SqlDataProvider implements IDataProvider {
             return result;
         } finally {
             DBUtils.close(rs);
+        }
+    }
+
+    @Override
+    public void updateCategory(CategoryDTO category) throws Exception {
+        System.out.println("updateCategory....");
+        PreparedStatement stmt = null;
+        try {
+            stmt = dbConn.getConnection().prepareStatement(
+                    "UPDATE category SET " +
+                            "name = ?, " +
+                            "sorting = ?, " +
+                            "parent = ? " +
+                            "WHERE id = ?");
+            stmt.setString(1, category.getName());
+            stmt.setInt(2, category.getSorting());
+            stmt.setInt(3, category.getParent());
+            stmt.setInt(4, category.getId());
+            stmt.execute();
+        } finally {
+            DBUtils.close(stmt);
+        }
+    }
+
+    @Override
+    public void updateNotice(NoticeDTO notice) throws Exception {
+        System.out.println("updateCategory....");
+        PreparedStatement stmt = null;
+        try {
+            stmt = dbConn.getConnection().prepareStatement(
+                    "UPDATE notice SET " +
+                    "name = ?, " +
+                    "sorting = ?, " +
+                    "categoryid = ? " +
+                    "WHERE id = ?");
+            stmt.setString(1, notice.getName());
+            stmt.setInt(2, notice.getSorting());
+            stmt.setInt(3, notice.getCategoryid());
+            stmt.setInt(4, notice.getId());
+            stmt.execute();
+        } finally {
+            DBUtils.close(stmt);
         }
     }
 }
