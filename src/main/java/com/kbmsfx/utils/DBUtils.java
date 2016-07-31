@@ -1,9 +1,9 @@
 package com.kbmsfx.utils;
 
-import com.kbmsfx.entity.TItem;
-
+import java.sql.PreparedStatement;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Predicate;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,15 +15,16 @@ public class DBUtils {
         if (c != null) c.close();
     }
 
-    public static String getString(String str) {
-        if (str == null) return "";
-        try {
-            return new String(str.getBytes("ISO-8859-1"), "UTF-16");
-        } catch (Exception e) { return ""; }
+    public static PreparedStatement setIntArray(PreparedStatement stmt, Collection<Integer> values, int pos) throws Exception {
+        for (Integer v : values) stmt.setInt(pos++, v);
+        return stmt;
     }
 
-    public static <T extends TItem> T getItemById(List<T> items, int id) {
-        if (items == null) return null;
-        return items.stream().filter(i -> i.getId() == id).findFirst().orElse(null);
+    public static String buildParams(int cnt) {
+        List<String> params = new ArrayList<>();
+        for (int ndx=0; ndx < cnt; ++ndx) {
+            params.add("?");
+        }
+        return String.join(", ", params);
     }
 }

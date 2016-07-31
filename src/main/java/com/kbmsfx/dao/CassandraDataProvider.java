@@ -9,6 +9,7 @@ import com.kbmsfx.dto.NoticeDTO;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,7 +37,7 @@ public class CassandraDataProvider implements IDataProvider {
     }
 
     @Override
-    public void deleteCategory(int id) throws Exception {}
+    public void deleteCategory(Collection<Integer> categoryIds) throws Exception {}
 
     @Override
     public void deleteNotice(int id) throws Exception {}

@@ -3,6 +3,7 @@ package com.kbmsfx.dao;
 import com.kbmsfx.dto.CategoryDTO;
 import com.kbmsfx.dto.NoticeDTO;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -17,6 +18,6 @@ public interface IDataProvider {
     List<NoticeDTO> getNoticeList() throws Exception;
     void updateCategory(CategoryDTO category) throws Exception;
     void updateNotice(NoticeDTO notice) throws Exception;
-    void deleteCategory(int id) throws Exception;
+    void deleteCategory(Collection<Integer> categoryIds) throws Exception;
     void deleteNotice(int id) throws Exception;
 }

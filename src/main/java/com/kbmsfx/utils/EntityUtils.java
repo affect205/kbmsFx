@@ -6,8 +6,11 @@ import com.kbmsfx.entity.Category;
 import com.kbmsfx.entity.Notice;
 import com.kbmsfx.entity.TItem;
 import com.kbmsfx.enums.TreeKind;
+import javafx.scene.control.TreeItem;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by Alex Balyschev on 14.07.2016.
@@ -32,5 +35,20 @@ public class EntityUtils {
 
     public static Notice createNotice(Category parent) {
         return new Notice(-1, String.format("Запись %s", new Date().getTime()), "", parent, 1);
+    }
+
+    public static Set<Integer> extractCatIds(TreeItem<TItem> ti) {
+        Set<Integer> result = new HashSet<>();
+        if (ti == null || ti.getValue() == null) return result;
+        TItem item = ti.getValue();
+        if (item.getKind() != TreeKind.CATEGORY) {
+            return result;
+        } else {
+            result.add(item.getId());
+            ti.getChildren().forEach(child-> {
+                result.addAll(extractCatIds(child));
+            });
+        }
+        return result;
     }
 }

@@ -12,10 +12,7 @@ import javafx.scene.control.TreeItem;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -83,6 +80,11 @@ public class CacheData {
         });
     }
 
+    public void printTree() {
+        System.out.println("printTree...");
+        treeCache.forEach(c -> printTree(c));
+    }
+
     public List<TreeItem<TItem>> getTreeCache() {
         return treeCache;
     }
@@ -118,16 +120,29 @@ public class CacheData {
         }
     }
 
-    public int addTreeItem(TItem item) throws Exception {
+    public TItem addTreeItem(TItem item) throws Exception {
         System.out.println("addTreeItem....");
         int recId = -1;
-        if (item == null) return -1;
+        if (item == null) return null;
         if (item.getKind() == TreeKind.CATEGORY) {
             recId = dataProvider.addCategory(EntityUtils.toCategoryDTO(item));
         } else if (item.getKind() == TreeKind.NOTICE) {
             recId = dataProvider.addNotice(EntityUtils.toNoticeDTO(item));
         }
-        return recId;
+        item.setId(recId);
+        updateCache(item);
+        return item;
+    }
+
+    public void removeTreeItem(TreeItem<TItem> ti) throws Exception {
+        System.out.println("removeTreeItem....");
+        if (ti == null || ti.getValue() == null) return;
+        if (ti.getValue().getKind() == TreeKind.CATEGORY) {
+            Collection<Integer> categoryIds = EntityUtils.extractCatIds(ti);
+            dataProvider.deleteCategory(categoryIds);
+        } else if (ti.getValue().getKind() == TreeKind.NOTICE) {
+            dataProvider.deleteNotice(ti.getValue().getId());
+        }
     }
 
     protected void updateCategoryCache() throws Exception {
@@ -187,5 +202,36 @@ public class CacheData {
                 }
             }
         });
+    }
+
+    protected void addTreeCache(List<TreeItem<TItem>> tree, TItem parent, TItem item) throws Exception {
+        if (item == null || (item.getKind() == TreeKind.NOTICE && parent == null)) return;
+        tree.forEach(ti -> {
+            TItem value = ti.getValue();
+            if (value.baseEquals(parent) && value.getKind() == TreeKind.CATEGORY) {
+                List<TreeItem<TItem>> children = ti.getChildren();
+                TreeItem<TItem> newTi = new TreeItem<>(item);
+                if (!children.contains(newTi)) children.add(newTi);
+                System.out.printf("Tree item %s has added\n", item.getId());
+                return;
+            } else {
+                try {
+                    addTreeCache(ti.getChildren(), parent, item);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    protected void updateCache(TItem item) throws Exception {
+        System.out.printf("updateCache id: %s...\n", item.getId());
+        if (item == null) return;
+        boolean isNew = false;
+        if (item.getKind() == TreeKind.CATEGORY) {
+            categoryCache.put(item.getId(), (Category)item);
+        } else if (item.getKind() == TreeKind.NOTICE) {
+            noticeCache.put(item.getId(), (Notice)item);
+        }
     }
 }

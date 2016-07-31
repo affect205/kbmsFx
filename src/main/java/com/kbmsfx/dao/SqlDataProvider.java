@@ -8,9 +8,8 @@ import com.kbmsfx.utils.DBUtils;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -68,15 +67,30 @@ public class SqlDataProvider implements IDataProvider {
     }
 
     @Override
-    public void deleteCategory(int id) throws Exception {
+    public void deleteCategory(Collection<Integer> categoryIds) throws Exception {
         System.out.println("deleteCategory....");
+        Connection conn = null;
         PreparedStatement stmt = null;
         try {
-            stmt = dbConn.getConnection().prepareStatement("DELETE FROM category WHERE id = ?");
-            stmt.setInt(1, id);
-            stmt.execute();
+            conn = dbConn.getConnection();
+            conn.setAutoCommit(false);
+            stmt = conn.prepareStatement(String.format("DELETE FROM category WHERE id in (%s)",
+                    DBUtils.buildParams(categoryIds.size())
+            ));
+            DBUtils.setIntArray(stmt, categoryIds, 1);
+            stmt.executeUpdate();
+            stmt = conn.prepareStatement(String.format("DELETE FROM notice WHERE categoryid in (%s)",
+                    DBUtils.buildParams(categoryIds.size())
+            ));
+            DBUtils.setIntArray(stmt, categoryIds, 1);
+            stmt.executeUpdate();
+            conn.commit();
+        } catch (Exception e) {
+            System.out.println("deleteCategory exception: " + e.getMessage());
+            if (conn != null) conn.rollback();
         } finally {
             DBUtils.close(stmt);
+            if (conn != null) conn.setAutoCommit(true);
         }
     }
 
