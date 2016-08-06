@@ -1,7 +1,9 @@
-package com.kbmsfx.gui.component;
+package com.kbmsfx.gui.center;
 
-import com.kbmsfx.events.NoticeEvent;
-import com.kbmsfx.events.UpdateEvent;
+import com.kbmsfx.entity.TItem;
+import com.kbmsfx.events.TItemEvent;
+import com.kbmsfx.gui.right.VDragboardPanel;
+import com.kbmsfx.gui.top.HDragboardPanel;
 import javafx.scene.layout.BorderPane;
 
 import javax.annotation.PostConstruct;
@@ -35,14 +37,10 @@ public class MainCenterPanel extends BorderPane {
         setTop(hDragboardPanel);
     }
 
-    public void noticeSelected(@Observes NoticeEvent event) {
-        System.out.println(String.format("noticeSelected - id: %s....", event.getNotice().getId()));
-        displayContainer.setNotice(event.getNotice());
-    }
-
-    public void updatePanel(@Observes UpdateEvent event) {
-        if (DisplayContainer.class == event.getUpdated()) {
-            setCenter(displayContainer);
-        }
+    public void itemSelected(@Observes TItemEvent event) {
+        TItem item = event.getItem();
+        if (item == null) return;
+        System.out.println(String.format("Item selected - %s....", item.toString()));
+        displayContainer.setItem(item);
     }
 }

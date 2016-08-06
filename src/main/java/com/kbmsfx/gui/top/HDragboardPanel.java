@@ -1,17 +1,15 @@
-package com.kbmsfx.gui.component;
+package com.kbmsfx.gui.top;
 
 import com.kbmsfx.entity.TItem;
 import com.kbmsfx.enums.TreeKind;
+import com.kbmsfx.gui.left.CategoryTree;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TreeItem;
+import javafx.scene.control.*;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
@@ -25,14 +23,21 @@ import java.util.stream.Collectors;
  * Created by Alex on 15.07.2016.
  */
 @Dependent
-public class HDragboardPanel extends HBox {
+public class HDragboardPanel extends TitledPane {
 
     private Set<MenuButton> buttonSet;
 
+    private HBox wrap;
+
     public HDragboardPanel() {
         super();
-        setMinHeight(30);
+        setMinHeight(50);
         setPadding(new Insets(10));
+        setText("Категории");
+        setExpanded(true);
+        addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEvent -> {
+            if (isCollapsible()) setExpanded(true);
+        });
         HBox.setMargin(this, new Insets(10, 0, 10, 0));
     }
 
@@ -40,11 +45,13 @@ public class HDragboardPanel extends HBox {
     public void init() {
         buttonSet = new HashSet<>();
 
+        wrap = new HBox();
+
         MenuButton m3 = new MenuButton("Eats");
         m3.setPrefWidth(100);
         m3.setPopupSide(Side.BOTTOM);
         m3.getItems().addAll(new MenuItem("Burger"), new MenuItem("Hot Dog"), new Menu(""));
-        getChildren().setAll(m3);
+        wrap.getChildren().add(m3);
 
         setOnDragDetected(event -> {
             event.consume();
@@ -68,6 +75,8 @@ public class HDragboardPanel extends HBox {
             event.setDropCompleted(success);
             event.consume();
         });
+
+        setContent(wrap);
     }
 
     protected void dropTItem(TreeItem<TItem> item) {

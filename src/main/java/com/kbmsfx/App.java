@@ -7,6 +7,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import org.jboss.weld.environment.se.Weld;
 
+import java.net.URL;
+
 /**
  * Created by Alex on 16.07.2016.
  */
@@ -41,6 +43,13 @@ public class App extends Application {
         stage.setWidth(1000);
         stage.setHeight(500);
         Scene scene = new Scene(new Group());
+
+        URL url = this.getClass().getClassLoader().getResource("custom.css");
+        if (url == null) {
+            System.out.println("Resource not found. Aborting."); System.exit(-1);
+        }
+        String css = url.toExternalForm();
+        scene.getStylesheets().add(css);
 
         BorderPane root = new BorderPane();
         root.setCenter(loader.buildCenter());

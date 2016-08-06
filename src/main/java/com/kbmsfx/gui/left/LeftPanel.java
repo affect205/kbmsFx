@@ -1,4 +1,4 @@
-package com.kbmsfx.gui.component;
+package com.kbmsfx.gui.left;
 
 import com.kbmsfx.events.RefreshTreeEvent;
 import com.kbmsfx.events.SelectedEvent;
@@ -20,7 +20,7 @@ public class LeftPanel extends VBox {
     CategoryTree categoryTree;
 
     @Inject
-    TreeEditPanel treeEditPanel;
+    SearchPanel searchPanel;
 
     public LeftPanel() {
         super();
@@ -28,14 +28,14 @@ public class LeftPanel extends VBox {
 
     @PostConstruct
     protected void init() {
-        getChildren().setAll(treeEditPanel, categoryTree);
+        getChildren().setAll(searchPanel, categoryTree);
         VBox.setVgrow(categoryTree, Priority.ALWAYS);
     }
 
     public void selectedItem(@Observes SelectedEvent event) {
         System.out.println("selected event...");
         if (event != null) {
-            treeEditPanel.setSelectedItem(event.getItem());
+            searchPanel.setSelectedItem(event.getItem());
         }
     }
 

@@ -1,4 +1,4 @@
-package com.kbmsfx.gui.component;
+package com.kbmsfx.gui.left;
 
 import com.kbmsfx.entity.TItem;
 import com.kbmsfx.events.RefreshTreeEvent;
@@ -21,7 +21,7 @@ import javax.inject.Inject;
  * Created by Alex on 27.07.2016.
  */
 @Dependent
-public class TreeEditPanel extends HBox {
+public class SearchPanel extends HBox {
 
     @Inject
     private CacheData dataProvider;
@@ -30,18 +30,18 @@ public class TreeEditPanel extends HBox {
     private Event<RefreshTreeEvent> refreshTreeEvent;
 
     private TextField nameTf;
-    private Button saveBtn;
+    private Button searchBtn;
 
-    public TreeEditPanel() {
+    public SearchPanel() {
         super();
     }
 
     @PostConstruct
     public void init() {
         nameTf = new TextField();
-        saveBtn = new Button("+");
-        saveBtn.setTooltip(new Tooltip("Сохранить запись"));
-        saveBtn.setOnAction(event -> {
+        searchBtn = new Button(">");
+        searchBtn.setTooltip(new Tooltip("Начать поиск"));
+        searchBtn.setOnAction(event -> {
             System.out.println("record saving....");
             TItem item = (TItem)nameTf.getUserData();
             if (item != null && !StringUtils.isEmpty(nameTf.getText())) {
@@ -52,7 +52,7 @@ public class TreeEditPanel extends HBox {
         });
         HBox.setHgrow(nameTf, Priority.ALWAYS);
         VBox.setMargin(this, new Insets(10, 0, 10, 0));
-        getChildren().setAll(nameTf, saveBtn);
+        getChildren().setAll(nameTf, searchBtn);
     }
 
     public void setSelectedItem(TItem item) {

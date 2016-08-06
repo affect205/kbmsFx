@@ -27,9 +27,16 @@ public class CacheData {
     @Inject
     IDataProvider dataProvider;
 
+    // category cache
     Map<Integer, Category> categoryCache;
+    // notice cache
     Map<Integer, Notice> noticeCache;
+    // tree cache
     List<TreeItem<TItem>> treeCache;
+    // selected tree categories
+    List<TreeItem<TItem>> categoryTreeCache;
+    // selected tree notices
+    List<TreeItem<TItem>> noticeTreeCache;
 
     public CacheData() {}
 
@@ -39,6 +46,8 @@ public class CacheData {
         updateCategoryCache();
         updateNoticeCache();
         updateTreeCache();
+        categoryTreeCache = new LinkedList<>();
+        noticeTreeCache  = new LinkedList<>();
     }
 
     private List<TreeItem<TItem>> getItemChildren(List<TItem> items, TItem parent) {

@@ -170,13 +170,15 @@ public class SqlDataProvider implements IDataProvider {
             stmt = dbConn.getConnection().prepareStatement(
                     "UPDATE notice SET " +
                     "name = ?, " +
+                    "content = ?, " +
                     "sorting = ?, " +
                     "categoryid = ? " +
                     "WHERE id = ?");
             stmt.setString(1, notice.getName());
-            stmt.setInt(2, notice.getSorting());
-            stmt.setInt(3, notice.getCategoryid());
-            stmt.setInt(4, notice.getId());
+            stmt.setString(2, notice.getContent());
+            stmt.setInt(3, notice.getSorting());
+            stmt.setInt(4, notice.getCategoryid());
+            stmt.setInt(5, notice.getId());
             stmt.execute();
         } finally {
             DBUtils.close(stmt);

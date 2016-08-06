@@ -1,10 +1,10 @@
-package com.kbmsfx.gui.component;
+package com.kbmsfx.gui.left;
 
 import com.kbmsfx.entity.Category;
 import com.kbmsfx.entity.Notice;
 import com.kbmsfx.entity.TItem;
 import com.kbmsfx.enums.TreeKind;
-import com.kbmsfx.events.NoticeEvent;
+import com.kbmsfx.events.TItemEvent;
 import com.kbmsfx.events.SelectedEvent;
 import com.kbmsfx.utils.CacheData;
 import com.kbmsfx.utils.EntityUtils;
@@ -28,7 +28,7 @@ public class CategoryTree extends TreeTableView {
     private CacheData dataProvider;
 
     @Inject
-    private Event<NoticeEvent> itemEvent;
+    private Event<TItemEvent> itemEvent;
 
     @Inject
     private Event<SelectedEvent> selectedEvent;
@@ -100,11 +100,8 @@ public class CategoryTree extends TreeTableView {
             if (TreeItem.class == newSelection.getClass()) {
                 TItem item = ((TreeItem<TItem>)newSelection).getValue();
                 ((TreeItem<TItem>)newSelection).setValue(item);
-                if (item != null && TreeKind.NOTICE == item.getKind()) {
-                    Notice notice = dataProvider.getNoticeCache().get(item.getId());
-                    if (notice != null) itemEvent.fire(new NoticeEvent(notice));
-                }
                 if (item != null) {
+                    itemEvent.fire(new TItemEvent(item));
                     selectedEvent.fire(new SelectedEvent(item));
                 }
                 addCatMenuItem.setVisible(item.getKind() == TreeKind.CATEGORY);

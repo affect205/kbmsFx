@@ -5,7 +5,8 @@ package com.kbmsfx;
  * User: Alexey Balyschev
  * Date: 10.07.16
  */
-import com.kbmsfx.gui.component.*;
+import com.kbmsfx.gui.left.LeftPanel;
+import com.kbmsfx.gui.center.MainCenterPanel;
 import com.kbmsfx.utils.CacheData;
 import javafx.application.Application;
 import javafx.application.Platform;
