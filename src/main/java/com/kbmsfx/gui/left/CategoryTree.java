@@ -4,6 +4,7 @@ import com.kbmsfx.entity.Category;
 import com.kbmsfx.entity.Notice;
 import com.kbmsfx.entity.TItem;
 import com.kbmsfx.enums.TreeKind;
+import com.kbmsfx.events.SelectRequestEvent;
 import com.kbmsfx.events.TItemEvent;
 import com.kbmsfx.events.SelectedEvent;
 import com.kbmsfx.utils.CacheData;
@@ -16,6 +17,7 @@ import javafx.util.Callback;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 /**
@@ -98,10 +100,10 @@ public class CategoryTree extends TreeTableView {
 
         getSelectionModel().selectedItemProperty().addListener((observableValue, oldSelection, newSelection) -> {
             if (TreeItem.class == newSelection.getClass()) {
-                TItem item = ((TreeItem<TItem>)newSelection).getValue();
-                ((TreeItem<TItem>)newSelection).setValue(item);
+                TreeItem<TItem> ti = ((TreeItem<TItem>)newSelection);
+                TItem item = ti.getValue();
                 if (item != null) {
-                    itemEvent.fire(new TItemEvent(item));
+                    itemEvent.fire(new TItemEvent(ti));
                     selectedEvent.fire(new SelectedEvent(item));
                 }
                 addCatMenuItem.setVisible(item.getKind() == TreeKind.CATEGORY);

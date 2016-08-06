@@ -10,6 +10,7 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
@@ -23,22 +24,21 @@ import java.util.stream.Collectors;
  * Created by Alex on 15.07.2016.
  */
 @Dependent
-public class HDragboardPanel extends TitledPane {
+public class CategoryQAPanel extends TitledPane {
 
     private Set<MenuButton> buttonSet;
 
     private HBox wrap;
 
-    public HDragboardPanel() {
+    public CategoryQAPanel() {
         super();
-        setMinHeight(50);
-        setPadding(new Insets(10));
+        setMinHeight(80);
+        setPadding(new Insets(10, 10, 0, 10));
         setText("Категории");
         setExpanded(true);
         addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEvent -> {
             if (isCollapsible()) setExpanded(true);
         });
-        HBox.setMargin(this, new Insets(10, 0, 10, 0));
     }
 
     @PostConstruct
@@ -52,6 +52,7 @@ public class HDragboardPanel extends TitledPane {
         m3.setPopupSide(Side.BOTTOM);
         m3.getItems().addAll(new MenuItem("Burger"), new MenuItem("Hot Dog"), new Menu(""));
         wrap.getChildren().add(m3);
+
 
         setOnDragDetected(event -> {
             event.consume();

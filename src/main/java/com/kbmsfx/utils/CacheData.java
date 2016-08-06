@@ -34,9 +34,9 @@ public class CacheData {
     // tree cache
     List<TreeItem<TItem>> treeCache;
     // selected tree categories
-    List<TreeItem<TItem>> categoryTreeCache;
+    Deque<TreeItem<TItem>> categoryQACache;
     // selected tree notices
-    List<TreeItem<TItem>> noticeTreeCache;
+    Deque<TreeItem<TItem>> noticeQACache;
 
     public CacheData() {}
 
@@ -46,8 +46,8 @@ public class CacheData {
         updateCategoryCache();
         updateNoticeCache();
         updateTreeCache();
-        categoryTreeCache = new LinkedList<>();
-        noticeTreeCache  = new LinkedList<>();
+        categoryQACache = new LinkedList<>();
+        noticeQACache  = new LinkedList<>();
     }
 
     private List<TreeItem<TItem>> getItemChildren(List<TItem> items, TItem parent) {
@@ -242,5 +242,33 @@ public class CacheData {
         } else if (item.getKind() == TreeKind.NOTICE) {
             noticeCache.put(item.getId(), (Notice)item);
         }
+    }
+
+    public Deque<TreeItem<TItem>> getNoticeQACache() {
+        return noticeQACache;
+    }
+
+    public void addNoticeQACache(TreeItem<TItem> ti) {
+        if (ti == null || ti.getValue() == null || ti.getValue().getKind() != TreeKind.NOTICE) return;
+        if (!noticeQACache.contains(ti)) {
+            noticeQACache.addFirst(ti);
+        } else {
+            noticeQACache.remove(ti);
+            noticeQACache.addFirst(ti);
+        }
+        if (noticeQACache.size() >= 10) noticeQACache.removeLast();
+    }
+
+    public void removeNoticeQACache(Integer noticeId) {
+        System.out.printf("removeNoticeQACache: %s\n", noticeId);
+        TreeItem<TItem> removed = null;
+        for (TreeItem<TItem> ti : noticeQACache) {
+            if (ti.getValue().getId() == noticeId) removed = ti;
+        }
+        if (removed != null) noticeQACache.remove(removed);
+    }
+
+    public Deque<TreeItem<TItem>> getCategoryQACache() {
+        return categoryQACache;
     }
 }

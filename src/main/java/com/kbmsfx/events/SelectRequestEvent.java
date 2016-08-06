@@ -4,13 +4,13 @@ import com.kbmsfx.entity.TItem;
 import javafx.scene.control.TreeItem;
 
 /**
- * Created by Alex on 16.07.2016.
+ * Created by Alex on 06.08.2016.
  */
-public class TItemEvent {
+public class SelectRequestEvent {
 
     private TreeItem<TItem> ti;
 
-    public TItemEvent(TreeItem<TItem> ti) {
+    public SelectRequestEvent(TreeItem<TItem> ti) {
         this.ti = ti;
     }
 

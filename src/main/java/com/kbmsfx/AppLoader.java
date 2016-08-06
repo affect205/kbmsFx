@@ -6,7 +6,7 @@ package com.kbmsfx;
  * Date: 10.07.16
  */
 import com.kbmsfx.gui.left.LeftPanel;
-import com.kbmsfx.gui.center.MainCenterPanel;
+import com.kbmsfx.gui.center.CenterPanel;
 import com.kbmsfx.utils.CacheData;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -28,7 +28,7 @@ public class AppLoader {
     private LeftPanel leftPanel;
 
     @Inject
-    private MainCenterPanel mainCenterPanel;
+    private CenterPanel centerPanel;
 
     public static void main(String[] args) {
         System.out.println("launch app...");
@@ -41,7 +41,7 @@ public class AppLoader {
     }
 
     public Pane buildCenter() {
-        return mainCenterPanel;
+        return centerPanel;
     }
 
     public Pane buildLeft() {

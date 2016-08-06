@@ -3,6 +3,7 @@ package com.kbmsfx.gui.center;
 import com.kbmsfx.entity.Notice;
 import com.kbmsfx.entity.TItem;
 import com.kbmsfx.enums.TreeKind;
+import com.kbmsfx.events.NoticeQAEvent;
 import com.kbmsfx.events.RefreshTreeEvent;
 import com.kbmsfx.utils.CacheData;
 import javafx.geometry.Insets;
@@ -10,6 +11,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.TreeItem;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -37,6 +39,9 @@ public class DisplayContainer extends VBox {
 
     @Inject
     private Event<RefreshTreeEvent> refreshTreeEvent;
+
+    @Inject
+    private Event<NoticeQAEvent> noticeQAEvent;
 
     @Inject
     private CacheData dataProvider;
@@ -73,14 +78,15 @@ public class DisplayContainer extends VBox {
         getChildren().add(buildToolbar());
     }
 
-    public void setItem(TItem item) {
-        if (item == null) return;
-        currentItem = item;
-        nameTf.setText(item.getName());
-        if (item.getKind() == TreeKind.NOTICE) {
-            Notice notice = (Notice)item;
+    public void setItem(TreeItem<TItem> ti) {
+        if (ti == null || ti.getValue() == null) return;
+        currentItem = ti.getValue();
+        nameTf.setText(currentItem.getName());
+        if (currentItem.getKind() == TreeKind.NOTICE) {
+            Notice notice = (Notice)currentItem;
             contentHE.setHtmlText(notice.getContent());
             contentHE.setDisable(false);
+            noticeQAEvent.fire(new NoticeQAEvent(ti));
         } else {
             contentHE.setHtmlText("");
             contentHE.setDisable(true);
