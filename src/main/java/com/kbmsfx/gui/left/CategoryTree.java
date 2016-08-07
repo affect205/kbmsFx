@@ -51,7 +51,7 @@ public class CategoryTree extends TreeTableView {
             try {
                 TItem newItem = dataProvider.addTreeItem(EntityUtils.createCategory((Category)parent));
                 if (newItem == null) return;
-                selected.getChildren().add(new TreeItem<>(newItem));
+                selected.getChildren().add(EntityUtils.buildTreeItem(newItem));
             } catch (Exception e) { e.printStackTrace(); }
         });
         addNotMenuItem = new MenuItem("+ Добавить запись");
@@ -63,7 +63,7 @@ public class CategoryTree extends TreeTableView {
             try {
                 TItem newItem = dataProvider.addTreeItem(EntityUtils.createNotice((Category)parent));
                 if (newItem == null) return;
-                selected.getChildren().add(new TreeItem<>(newItem));
+                selected.getChildren().add(EntityUtils.buildTreeItem(newItem));
             } catch (Exception e) { e.printStackTrace(); }
         });
         removeMenuItem = new MenuItem("- Удалить");
@@ -81,7 +81,7 @@ public class CategoryTree extends TreeTableView {
 
     @PostConstruct
     public void init() {
-        root = new TreeItem<>(new Category(-1, "Scientia potentia est"));
+        root = EntityUtils.buildTreeItem(new Category(-1, "Scientia potentia est"));
         root.setExpanded(true);
         root.getChildren().addAll(dataProvider.getTreeCache());
         setRoot(root);
@@ -180,8 +180,7 @@ public class CategoryTree extends TreeTableView {
 
     protected void filter(TreeItem<TItem> root, String filter, TreeItem<TItem> filteredRoot) {
         for (TreeItem<TItem> child : root.getChildren()) {
-            TreeItem<TItem> filteredChild = new TreeItem<>();
-            filteredChild.setValue(child.getValue());
+            TreeItem<TItem> filteredChild = EntityUtils.buildTreeItem(child.getValue());
             filteredChild.setExpanded(true);
             filter(child, filter, filteredChild );
             if (!filteredChild.getChildren().isEmpty() || isMatch(filteredChild.getValue(), filter)) {

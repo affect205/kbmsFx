@@ -1,6 +1,8 @@
 package com.kbmsfx.gui.left;
 
+import com.kbmsfx.enums.IconKind;
 import com.kbmsfx.events.SearchEvent;
+import com.kbmsfx.utils.GuiUtils;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;

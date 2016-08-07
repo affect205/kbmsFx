@@ -5,6 +5,7 @@ import com.kbmsfx.dto.NoticeDTO;
 import com.kbmsfx.entity.Category;
 import com.kbmsfx.entity.Notice;
 import com.kbmsfx.entity.TItem;
+import com.kbmsfx.enums.IconKind;
 import com.kbmsfx.enums.TreeKind;
 import javafx.scene.control.TreeItem;
 
@@ -50,5 +51,13 @@ public class EntityUtils {
             });
         }
         return result;
+    }
+
+    public static TreeItem<TItem> buildTreeItem(TItem item) {
+        if (item == null) return null;
+        IconKind iconKind = item.getKind() == TreeKind.CATEGORY ? IconKind.CATEGORY : IconKind.NOTICE;
+        TreeItem<TItem> ti = new TreeItem<>(item, GuiUtils.buildIcon(iconKind));
+        if (item.getKind() == TreeKind.CATEGORY) ti.setExpanded(true);
+        return ti;
     }
 }

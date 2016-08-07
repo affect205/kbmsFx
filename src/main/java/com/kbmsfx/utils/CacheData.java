@@ -70,11 +70,7 @@ public class CacheData {
 
         List<TreeItem<TItem>> children = items.stream()
                 .filter(p::test)
-                .map(item -> {
-                    TreeItem<TItem> ti = new TreeItem<>(item);
-                    if (item.getKind() == TreeKind.CATEGORY) ti.setExpanded(true);
-                    return ti;
-                })
+                .map(item -> EntityUtils.buildTreeItem(item))
                 .collect(Collectors.toList());
         children.forEach(item -> {
             item.getChildren().setAll(getItemChildren(items, item.getValue()));
@@ -206,26 +202,6 @@ public class CacheData {
             } else {
                 try {
                     updateTreeCache(ti.getChildren(), item);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
-    protected void addTreeCache(List<TreeItem<TItem>> tree, TItem parent, TItem item) throws Exception {
-        if (item == null || (item.getKind() == TreeKind.NOTICE && parent == null)) return;
-        tree.forEach(ti -> {
-            TItem value = ti.getValue();
-            if (value.baseEquals(parent) && value.getKind() == TreeKind.CATEGORY) {
-                List<TreeItem<TItem>> children = ti.getChildren();
-                TreeItem<TItem> newTi = new TreeItem<>(item);
-                if (!children.contains(newTi)) children.add(newTi);
-                System.out.printf("Tree item %s has added\n", item.getId());
-                return;
-            } else {
-                try {
-                    addTreeCache(ti.getChildren(), parent, item);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

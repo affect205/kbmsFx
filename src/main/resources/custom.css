@@ -1,0 +1,12 @@
+/*.iconCategory  {*/
+    /*-fx-background-color: whitesmoke;*/
+/*}*/
+/*.iconCategory > .label {*/
+    /*-fx-graphic: url("icons/folder_64.png");*/
+/*}*/
+/*.iconNotice  {*/
+    /*-fx-background-color: whitesmoke;*/
+/*}*/
+/*.iconNotice > .label {*/
+    /*-fx-graphic: url("icons/write_64.png");*/
+/*}*/
