@@ -271,4 +271,31 @@ public class CacheData {
     public Deque<TreeItem<TItem>> getCategoryQACache() {
         return categoryQACache;
     }
+
+    /**
+     * @return -1: no addition, 0: addition first, 1: addition first, removal last
+     */
+    public int addCategoryQACache(TreeItem<TItem> ti) {
+        if (ti == null || ti.getValue() == null || ti.getValue().getKind() != TreeKind.CATEGORY) return -1;
+        if (!categoryQACache.contains(ti)) {
+            categoryQACache.addFirst(ti);
+        } else {
+            categoryQACache.remove(ti);
+            categoryQACache.addFirst(ti);
+        }
+        if (categoryQACache.size() >= 10) {
+            categoryQACache.removeLast();
+            return 1;
+        }
+        return 0;
+    }
+
+    public void removeCategoryQACache(Integer noticeId) {
+        System.out.printf("removeNoticeQACache: %s\n", noticeId);
+        TreeItem<TItem> removed = null;
+        for (TreeItem<TItem> ti : categoryQACache) {
+            if (ti.getValue().getId() == noticeId) removed = ti;
+        }
+        if (removed != null) categoryQACache.remove(removed);
+    }
 }

@@ -52,14 +52,6 @@ public class NoticeQAPanel extends TitledPane {
         wrap = new VBox();
         wrap.setMinHeight(300);
         wrap.setAlignment(Pos.TOP_CENTER);
-
-        MenuButton m = new MenuButton("Eats");
-        m.setPrefWidth(120);
-        m.setUserData(1);
-        m.setPopupSide(Side.BOTTOM);
-        m.getItems().addAll(buildCloseMI(m));
-
-        wrap.getChildren().addAll(m);
         setContent(wrap);
     }
 

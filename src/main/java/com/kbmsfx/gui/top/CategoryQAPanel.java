@@ -3,6 +3,7 @@ package com.kbmsfx.gui.top;
 import com.kbmsfx.entity.TItem;
 import com.kbmsfx.enums.TreeKind;
 import com.kbmsfx.gui.left.CategoryTree;
+import com.kbmsfx.utils.CacheData;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.control.*;
@@ -10,14 +11,11 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import javax.inject.Inject;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -26,7 +24,10 @@ import java.util.stream.Collectors;
 @Dependent
 public class CategoryQAPanel extends TitledPane {
 
-    private Set<MenuButton> buttonSet;
+    @Inject
+    private CacheData dataProvider;
+
+    private Map<Object, MenuButton> categoryQAButtons;
 
     private HBox wrap;
 
@@ -43,33 +44,25 @@ public class CategoryQAPanel extends TitledPane {
 
     @PostConstruct
     public void init() {
-        buttonSet = new HashSet<>();
+        categoryQAButtons = new HashMap<>();
 
         wrap = new HBox();
-
-        MenuButton m3 = new MenuButton("Eats");
-        m3.setPrefWidth(100);
-        m3.setPopupSide(Side.BOTTOM);
-        m3.getItems().addAll(new MenuItem("Burger"), new MenuItem("Hot Dog"), new Menu(""));
-        wrap.getChildren().add(m3);
-
-
-        setOnDragDetected(event -> {
+        wrap.setOnDragDetected(event -> {
             event.consume();
         });
-        setOnDragOver(event -> {
+        wrap.setOnDragOver(event -> {
             if (event.getDragboard().hasString()) {
                 event.acceptTransferModes(TransferMode.COPY);
             }
             event.consume();
         });
-        setOnDragDropped(event -> {
+        wrap.setOnDragDropped(event -> {
             Dragboard db = event.getDragboard();
             boolean success = false;
             if (event.getGestureSource().getClass() == CategoryTree.class) {
                 CategoryTree tree = (CategoryTree) event.getGestureSource();
                 TreeItem<TItem> item =  (TreeItem<TItem>)tree.getSelectionModel().getSelectedItem();
-                if (item != null) {
+                if (item != null && item.getValue() != null && item.getValue().getKind() == TreeKind.CATEGORY) {
                     dropTItem(item);
                 }
             }
@@ -80,39 +73,64 @@ public class CategoryQAPanel extends TitledPane {
         setContent(wrap);
     }
 
-    protected void dropTItem(TreeItem<TItem> item) {
-        if (item == null) return;
-        MenuButton menuBtn = new MenuButton(item.getValue().getName());
-        menuBtn.setMaxWidth(160);
-        menuBtn.setPopupSide(Side.BOTTOM);
-        menuBtn.setUserData(item);
-        menuBtn.setId(String.format("%s%s", item.getValue().getKind(), item.getValue().getId()));
-        menuBtn.getItems().setAll(buildPath(item));
-
-        getChildren().clear();
-        buttonSet = buttonSet.stream()
-                .filter(b -> !b.getId().equals(menuBtn.getId()))
-                .collect(Collectors.toSet());
-        buttonSet.add(menuBtn);
-        getChildren().setAll(buttonSet);
-
-        System.out.println(String.format("Dropped - id: %s, name: %s, kind: %s", item.getValue().getId(), item.getValue().getName(), item.getValue().getKind()));
+    protected void dropTItem(TreeItem<TItem> ti) {
+        if (ti == null || ti.getValue() == null) return;
+        int code = dataProvider.addCategoryQACache(ti);
+        if (code > -1) {
+            TItem item = ti.getValue();
+            MenuButton categoryMB = new MenuButton(item.getName());
+            categoryMB.setTooltip(new Tooltip(item.getName()));
+            categoryMB.setMaxWidth(160);
+            categoryMB.setPopupSide(Side.BOTTOM);
+            categoryMB.setUserData(ti);
+            categoryMB.getItems().setAll(buildPath(ti));
+            categoryMB.getItems().add(buildCloseMI(categoryMB));
+            categoryQAButtons.put(item.getId(), categoryMB);
+            refreshPanel(item.getId());
+            System.out.printf("Dropped category: %s\n", ti.getValue().toString());
+        }
     }
-
 
     protected List<MenuItem> buildPath(TreeItem<TItem> current) {
         List<MenuItem> children = new LinkedList<>();
-        current.getChildren().forEach(c -> {
-            TItem child = c.getValue();
+        current.getChildren().forEach(ti -> {
+            TItem child = ti.getValue();
             MenuItem item = child.getKind() == TreeKind.CATEGORY ?
                     new Menu(child.getName()) : new MenuItem(child.getName());
-            item.setUserData(child);
-            item.setId(String.format("%s%s", child.getKind(), child.getId()));
+            item.setUserData(ti);
             if (child.getKind() == TreeKind.CATEGORY) {
-                ((Menu)item).getItems().setAll(buildPath(c));
+                ((Menu)item).getItems().setAll(buildPath(ti));
             }
             children.add(item);
         });
         return children;
+    }
+
+    protected MenuItem buildCloseMI(MenuButton categoryMB) {
+        MenuItem closeMI = new MenuItem("X Закрыть");
+        closeMI.setOnAction(event -> {
+            TreeItem<TItem> ti = (TreeItem<TItem>)categoryMB.getUserData();
+            if (ti == null || ti.getValue() == null) return;
+            dataProvider.removeCategoryQACache(ti.getValue().getId());
+            wrap.getChildren().remove(categoryMB);
+            categoryQAButtons.remove(categoryMB);
+        });
+        return closeMI;
+    }
+
+    protected void refreshPanel(Object addedKey) {
+        Deque<TreeItem<TItem>> categoryQACache = dataProvider.getCategoryQACache();
+        Set<Object> removedKeys = new HashSet<>();
+        Set<Object> cacheKeys = categoryQACache.stream().map(ti -> ti.getValue().getId()).collect(Collectors.toSet());
+        categoryQAButtons.keySet().forEach(key -> {
+            if (!cacheKeys.contains(key)) removedKeys.add(key);
+        });
+        removedKeys.forEach(key -> {
+            wrap.getChildren().remove(categoryQAButtons.get(key));
+            categoryQAButtons.remove(key);
+        });
+        MenuButton addedMB = categoryQAButtons.get(addedKey);
+        wrap.getChildren().remove(addedMB);
+        wrap.getChildren().add(addedMB);
     }
 }
