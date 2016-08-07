@@ -1,8 +1,8 @@
 package com.kbmsfx.gui.left;
 
 import com.kbmsfx.events.RefreshTreeEvent;
+import com.kbmsfx.events.SearchEvent;
 import com.kbmsfx.events.SelectRequestEvent;
-import com.kbmsfx.events.SelectedEvent;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
@@ -33,12 +33,6 @@ public class LeftPanel extends VBox {
         VBox.setVgrow(categoryTree, Priority.ALWAYS);
     }
 
-    public void selectedItem(@Observes SelectedEvent event) {
-        System.out.println("selected event...");
-        if (event == null) return;
-        searchPanel.setSelectedItem(event.getItem());
-    }
-
     public void refreshTree(@Observes RefreshTreeEvent event) {
         System.out.println("refreshTree...");
         categoryTree.setSelectedItem(event.getSelected());
@@ -48,5 +42,11 @@ public class LeftPanel extends VBox {
         System.out.println("selectRequestTree...");
         if (event == null || event.getItem() == null) return;
         categoryTree.getSelectionModel().select(event.getItem());
+    }
+
+    public void filterTree(@Observes SearchEvent event) {
+        System.out.println("filterTree...");
+        if (event == null) return;
+        categoryTree.filterBy(event.getFilter());
     }
 }

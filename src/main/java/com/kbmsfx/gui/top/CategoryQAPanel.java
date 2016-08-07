@@ -2,6 +2,7 @@ package com.kbmsfx.gui.top;
 
 import com.kbmsfx.entity.TItem;
 import com.kbmsfx.enums.TreeKind;
+import com.kbmsfx.events.SelectRequestEvent;
 import com.kbmsfx.gui.left.CategoryTree;
 import com.kbmsfx.utils.CacheData;
 import javafx.geometry.Insets;
@@ -14,6 +15,7 @@ import javafx.scene.layout.HBox;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
+import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -27,8 +29,10 @@ public class CategoryQAPanel extends TitledPane {
     @Inject
     private CacheData dataProvider;
 
-    private Map<Object, MenuButton> categoryQAButtons;
+    @Inject
+    Event<SelectRequestEvent> selectRequestEvent;
 
+    private Map<Object, MenuButton> categoryQAButtons;
     private HBox wrap;
 
     public CategoryQAPanel() {
@@ -100,6 +104,11 @@ public class CategoryQAPanel extends TitledPane {
             item.setUserData(ti);
             if (child.getKind() == TreeKind.CATEGORY) {
                 ((Menu)item).getItems().setAll(buildPath(ti));
+            } else if (child.getKind() == TreeKind.NOTICE) {
+                item.setOnAction(event -> {
+                    System.out.printf("noticeQA from categoryQA clicked %s\n", ti);
+                    selectRequestEvent.fire(new SelectRequestEvent(ti));
+                });
             }
             children.add(item);
         });

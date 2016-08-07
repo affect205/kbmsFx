@@ -1,23 +1,22 @@
 package com.kbmsfx.gui.left;
 
 import com.kbmsfx.entity.Category;
-import com.kbmsfx.entity.Notice;
 import com.kbmsfx.entity.TItem;
 import com.kbmsfx.enums.TreeKind;
-import com.kbmsfx.events.SelectRequestEvent;
 import com.kbmsfx.events.TItemEvent;
-import com.kbmsfx.events.SelectedEvent;
 import com.kbmsfx.utils.CacheData;
 import com.kbmsfx.utils.EntityUtils;
+import com.kbmsfx.utils.StringUtils;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.scene.control.*;
-import javafx.scene.input.*;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.util.Callback;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 /**
@@ -32,15 +31,13 @@ public class CategoryTree extends TreeTableView {
     @Inject
     private Event<TItemEvent> itemEvent;
 
-    @Inject
-    private Event<SelectedEvent> selectedEvent;
-
     private TreeItem<TItem> root;
 
     private MenuItem addCatMenuItem;
     private MenuItem addNotMenuItem;
     private MenuItem removeMenuItem;
     private ContextMenu contextMenu;
+    private boolean isFiltered = false;
 
     public CategoryTree() {
         super();
@@ -99,15 +96,16 @@ public class CategoryTree extends TreeTableView {
         getColumns().add(column);
 
         getSelectionModel().selectedItemProperty().addListener((observableValue, oldSelection, newSelection) -> {
-            if (TreeItem.class == newSelection.getClass()) {
+            if (newSelection != null && TreeItem.class == newSelection.getClass()) {
                 TreeItem<TItem> ti = ((TreeItem<TItem>)newSelection);
                 TItem item = ti.getValue();
                 if (item != null) {
                     itemEvent.fire(new TItemEvent(ti));
-                    selectedEvent.fire(new SelectedEvent(item));
                 }
-                addCatMenuItem.setVisible(item.getKind() == TreeKind.CATEGORY);
-                addNotMenuItem.setVisible(item.getKind() == TreeKind.CATEGORY);
+                // @TODO think about CRUD for filtered data
+                addCatMenuItem.setVisible(item.getKind() == TreeKind.CATEGORY && !isFiltered);
+                addNotMenuItem.setVisible(item.getKind() == TreeKind.CATEGORY && !isFiltered);
+                removeMenuItem.setVisible(!isFiltered);
             }
         });
 
@@ -119,7 +117,8 @@ public class CategoryTree extends TreeTableView {
                 // Drag and Drop
                 row.setOnDragDetected(event -> {
                     TreeItem<TItem> selected = (TreeItem<TItem>) getSelectionModel().getSelectedItem();
-                    if (selected != null) {
+                    // @TODO think about DnD for filtered data
+                    if (selected != null && !isFiltered) {
                         Dragboard db = CategoryTree.this.startDragAndDrop(TransferMode.ANY);
                         db.setDragView(row.snapshot(null, null));
 
@@ -164,4 +163,35 @@ public class CategoryTree extends TreeTableView {
             refresh();
         }
     }
+
+    protected void filterBy(String filter) {
+        if (StringUtils.isEmpty(filter)) {
+            setRoot(root);
+            isFiltered = false;
+        }
+        else {
+            TreeItem<TItem> filteredRoot = new TreeItem<>();
+            filter(root, filter, filteredRoot);
+            setRoot(filteredRoot);
+            isFiltered = true;
+        }
+    }
+
+
+    protected void filter(TreeItem<TItem> root, String filter, TreeItem<TItem> filteredRoot) {
+        for (TreeItem<TItem> child : root.getChildren()) {
+            TreeItem<TItem> filteredChild = new TreeItem<>();
+            filteredChild.setValue(child.getValue());
+            filteredChild.setExpanded(true);
+            filter(child, filter, filteredChild );
+            if (!filteredChild.getChildren().isEmpty() || isMatch(filteredChild.getValue(), filter)) {
+                filteredRoot.getChildren().add(filteredChild);
+            }
+        }
+    }
+
+    protected boolean isMatch(TItem value, String filter) {
+        return value != null && value.getName().toLowerCase().contains(filter.toLowerCase().trim());
+    }
+
 }
