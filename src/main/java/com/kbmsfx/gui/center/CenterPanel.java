@@ -1,7 +1,10 @@
 package com.kbmsfx.gui.center;
 
+import com.kbmsfx.annotations.QAEvent;
 import com.kbmsfx.entity.TItem;
-import com.kbmsfx.events.NoticeQAEvent;
+import com.kbmsfx.enums.TreeKind;
+import com.kbmsfx.events.ShowNoticeQAEvent;
+import com.kbmsfx.events.RefreshQAEvent;
 import com.kbmsfx.events.TItemEvent;
 import com.kbmsfx.gui.right.NoticeQAPanel;
 import com.kbmsfx.gui.top.CategoryQAPanel;
@@ -46,9 +49,20 @@ public class CenterPanel extends BorderPane {
         displayContainer.setItem(ti);
     }
 
-    public void updateNoticeQA(@Observes NoticeQAEvent event) {
+    public void showNoticeQA(@Observes ShowNoticeQAEvent event) {
         TreeItem<TItem> ti = event.getItem();
         if (ti == null) return;
         noticeQAPanel.setItem(ti);
+    }
+
+    public void refreshNoticeQA(@Observes @QAEvent(QAEvent.QAТуре.NOTICE)RefreshQAEvent event) {
+        if (event == null || event.getItem() == null || event.getItem().getValue() == null || event.getItem().getValue().getKind() != TreeKind.NOTICE) return;
+        System.out.printf("refreshNoticeQA: %s...\n", event.getItem().getValue().toString());
+        noticeQAPanel.refreshNoticeQA(event.getItem());
+    }
+
+    public void refreshCategoryQA(@Observes @QAEvent(QAEvent.QAТуре.CATEGORY)RefreshQAEvent event) {
+        if (event == null || event.getItem() == null || event.getItem().getValue() == null || event.getItem().getValue().getKind() != TreeKind.CATEGORY) return;
+        System.out.println("refreshCategoryQA...");
     }
 }

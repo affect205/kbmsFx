@@ -7,11 +7,11 @@ import javafx.scene.control.TreeItem;
 /**
  * Created by Alex on 06.08.2016.
  */
-public class NoticeQAEvent {
+public class ShowNoticeQAEvent {
 
     TreeItem<TItem> item;
 
-    public NoticeQAEvent(TreeItem<TItem> item) {
+    public ShowNoticeQAEvent(TreeItem<TItem> item) {
         if (item.getValue() == null || item.getValue().getKind() != TreeKind.NOTICE) return;
         this.item = item;
     }

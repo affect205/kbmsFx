@@ -40,8 +40,8 @@ public class App extends Application {
     public void start(AppLoader loader) {
         System.out.println("start app...");
         stage.setTitle("HTML");
-        stage.setWidth(1000);
-        stage.setHeight(500);
+        stage.setWidth(1200);
+        stage.setHeight(680);
         Scene scene = new Scene(new Group());
 
         URL url = this.getClass().getClassLoader().getResource("custom.css");

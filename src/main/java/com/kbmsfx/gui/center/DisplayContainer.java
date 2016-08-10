@@ -1,9 +1,11 @@
 package com.kbmsfx.gui.center;
 
+import com.kbmsfx.annotations.QAEvent;
 import com.kbmsfx.entity.Notice;
 import com.kbmsfx.entity.TItem;
 import com.kbmsfx.enums.TreeKind;
-import com.kbmsfx.events.NoticeQAEvent;
+import com.kbmsfx.events.ShowNoticeQAEvent;
+import com.kbmsfx.events.RefreshQAEvent;
 import com.kbmsfx.events.RefreshTreeEvent;
 import com.kbmsfx.utils.CacheData;
 import javafx.geometry.Insets;
@@ -35,13 +37,19 @@ public class DisplayContainer extends VBox {
     private TitledPane titledPane;
     private HBox toolbar;
 
-    private TItem currentItem;
+    private TreeItem<TItem> currentTI;
 
     @Inject
     private Event<RefreshTreeEvent> refreshTreeEvent;
 
     @Inject
-    private Event<NoticeQAEvent> noticeQAEvent;
+    private Event<ShowNoticeQAEvent> noticeQAEvent;
+
+    @Inject @QAEvent(QAEvent.QAТуре.CATEGORY)
+    private Event<RefreshQAEvent> refreshCQAEvent;
+
+    @Inject @QAEvent(QAEvent.QAТуре.NOTICE)
+    private Event<RefreshQAEvent> refreshNQAEvent;
 
     @Inject
     private CacheData dataProvider;
@@ -80,13 +88,14 @@ public class DisplayContainer extends VBox {
 
     public void setItem(TreeItem<TItem> ti) {
         if (ti == null || ti.getValue() == null) return;
-        currentItem = ti.getValue();
+        currentTI = ti;
+        TItem currentItem = ti.getValue();
         nameTf.setText(currentItem.getName());
         if (currentItem.getKind() == TreeKind.NOTICE) {
             Notice notice = (Notice)currentItem;
             contentHE.setHtmlText(notice.getContent());
             contentHE.setDisable(false);
-            noticeQAEvent.fire(new NoticeQAEvent(ti));
+            noticeQAEvent.fire(new ShowNoticeQAEvent(ti));
         } else {
             contentHE.setHtmlText("");
             contentHE.setDisable(true);
@@ -107,12 +116,17 @@ public class DisplayContainer extends VBox {
 
     public void saveData() {
         System.out.println("Save data...");
-        if (currentItem == null) return;
-        currentItem.setName(nameTf.getText().trim());
-        if (currentItem.getKind() == TreeKind.NOTICE) {
-            ((Notice)currentItem).setContent(contentHE.getHtmlText());
+        if (currentTI == null || currentTI.getValue() == null) return;
+        currentTI.getValue().setName(nameTf.getText().trim());
+        if (currentTI.getValue().getKind() == TreeKind.NOTICE) {
+            ((Notice)currentTI.getValue()).setContent(contentHE.getHtmlText());
         }
-        dataProvider.editTreeItem(currentItem);
-        refreshTreeEvent.fire(new RefreshTreeEvent(currentItem));
+        dataProvider.editTreeItem(currentTI.getValue());
+        refreshTreeEvent.fire(new RefreshTreeEvent(currentTI.getValue()));
+        if (currentTI.getValue().getKind() == TreeKind.CATEGORY) {
+            refreshCQAEvent.fire(new RefreshQAEvent(currentTI));
+        } else if (currentTI.getValue().getKind() == TreeKind.NOTICE) {
+            refreshNQAEvent.fire(new RefreshQAEvent(currentTI));
+        }
     }
 }

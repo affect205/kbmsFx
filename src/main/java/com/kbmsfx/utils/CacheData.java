@@ -195,7 +195,7 @@ public class CacheData {
         if (item == null) return;
         tree.forEach(ti -> {
             TItem value = ti.getValue();
-            if (value.baseEquals(item)) {
+            if (value.customEquals(item)) {
                 ti.setValue(item);
                 System.out.printf("Tree item %s has changed\n", item.getId());
                 return;
@@ -233,6 +233,18 @@ public class CacheData {
             noticeQACache.addFirst(ti);
         }
         if (noticeQACache.size() >= 10) noticeQACache.removeLast();
+    }
+
+    public TItem updateNoticeQACache(TreeItem<TItem> ti) {
+        if (ti == null || ti.getValue() == null || ti.getValue().getKind() != TreeKind.NOTICE) return null;
+        TItem item =  ti.getValue();
+        for (TreeItem<TItem> cacheTi : noticeQACache) {
+            if (ti.getValue().customEquals(cacheTi.getValue())) {
+                ti.getValue().setName(item.getName());
+                return cacheTi.getValue();
+            }
+        }
+        return null;
     }
 
     public void removeNoticeQACache(Integer noticeId) {

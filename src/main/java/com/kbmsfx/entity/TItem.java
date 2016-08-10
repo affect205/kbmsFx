@@ -72,7 +72,7 @@ public abstract class TItem {
         return result;
     }
 
-    public boolean baseEquals(TItem item) {
+    public boolean customEquals(TItem item) {
         if (item == null) return false;
         return id == item.getId() && kind == item.getKind();
     }

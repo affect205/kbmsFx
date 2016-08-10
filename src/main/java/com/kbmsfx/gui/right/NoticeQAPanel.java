@@ -74,7 +74,16 @@ public class NoticeQAPanel extends TitledPane {
             noticeMB.getItems().addAll(buildViewMI(noticeMB), buildCloseMI(noticeMB));
             wrap.getChildren().add(noticeMB);
             wrap.setMargin(noticeMB, new Insets(5, 0, 0, 0));
+            noticeQAButtons.put(item.getId(), noticeMB);
         });
+    }
+
+    public void refreshNoticeQA(TreeItem<TItem> ti) {
+        TItem updated = dataProvider.updateNoticeQACache(ti);
+        if (updated != null && noticeQAButtons.get(updated.getId()) != null) {
+            noticeQAButtons.get(updated.getId()).setText(updated.getName());
+            noticeQAButtons.get(updated.getId()).setTooltip(new Tooltip(updated.getName()));
+        }
     }
 
     protected MenuItem buildCloseMI(MenuButton noticeMB) {
