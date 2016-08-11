@@ -11,6 +11,7 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.scene.control.*;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.util.Callback;
 
@@ -77,6 +78,9 @@ public class CategoryTree extends TreeTableView {
         });
         contextMenu.getItems().setAll(addCatMenuItem, addNotMenuItem, removeMenuItem);
         setContextMenu(contextMenu);
+        addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            refresh();
+        });
     }
 
     @PostConstruct
@@ -85,7 +89,7 @@ public class CategoryTree extends TreeTableView {
         root.setExpanded(true);
         root.getChildren().addAll(dataProvider.getTreeCache());
         setRoot(root);
-        setShowRoot(false);
+        setShowRoot(true);
 
         TreeTableColumn<TItem, String> column = new TreeTableColumn<>("Дерево знаний");
         column.setPrefWidth(280);
