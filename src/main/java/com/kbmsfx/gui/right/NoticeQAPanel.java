@@ -4,12 +4,12 @@ import com.kbmsfx.entity.TItem;
 import com.kbmsfx.events.SelectRequestEvent;
 import com.kbmsfx.utils.CacheData;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.FlowPane;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
@@ -30,28 +30,26 @@ public class NoticeQAPanel extends TitledPane {
     @Inject
     Event<SelectRequestEvent> selectRequestEvent;
 
-    private VBox wrap;
+    private FlowPane wrap;
     private Map<Object, MenuButton> noticeQAButtons;
 
     public NoticeQAPanel() {
         super();
         noticeQAButtons = new HashMap<>();
-
-        setPrefWidth(160);
         setPadding(new Insets(10));
         setText("Записи");
         setExpanded(true);
         addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEvent -> {
             if (isCollapsible()) setExpanded(true);
         });
-        HBox.setMargin(this, new Insets(10, 0, 10, 0));
     }
 
     @PostConstruct
     public void init() {
-        wrap = new VBox();
-        wrap.setMinHeight(300);
-        wrap.setAlignment(Pos.TOP_CENTER);
+        wrap = new FlowPane();
+        wrap.setPrefHeight(130);
+        wrap.setAlignment(Pos.TOP_LEFT);
+        wrap.setOrientation(Orientation.HORIZONTAL);
         setContent(wrap);
     }
 
@@ -69,7 +67,7 @@ public class NoticeQAPanel extends TitledPane {
             MenuButton noticeMB = new MenuButton(item.getName());
             noticeMB.setUserData(ti);
             noticeMB.setTooltip(new Tooltip(item.getName()));
-            noticeMB.setPrefWidth(120);
+            noticeMB.setMaxWidth(160);
             noticeMB.setPopupSide(Side.BOTTOM);
             noticeMB.getItems().addAll(buildViewMI(noticeMB), buildCloseMI(noticeMB));
             wrap.getChildren().add(noticeMB);

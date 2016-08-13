@@ -6,12 +6,14 @@ import com.kbmsfx.events.SelectRequestEvent;
 import com.kbmsfx.gui.left.CategoryTree;
 import com.kbmsfx.utils.CacheData;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.FlowPane;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
@@ -33,12 +35,11 @@ public class CategoryQAPanel extends TitledPane {
     Event<SelectRequestEvent> selectRequestEvent;
 
     private Map<Object, MenuButton> categoryQAButtons;
-    private HBox wrap;
+    private FlowPane wrap;
 
     public CategoryQAPanel() {
         super();
-        setMinHeight(80);
-        setPadding(new Insets(10, 10, 0, 10));
+        setPadding(new Insets(10));
         setText("Категории");
         setExpanded(true);
         addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEvent -> {
@@ -50,7 +51,10 @@ public class CategoryQAPanel extends TitledPane {
     public void init() {
         categoryQAButtons = new HashMap<>();
 
-        wrap = new HBox();
+        wrap = new FlowPane();
+        wrap.setPrefHeight(130);
+        wrap.setAlignment(Pos.TOP_LEFT);
+        wrap.setOrientation(Orientation.HORIZONTAL);
         wrap.setOnDragDetected(event -> {
             event.consume();
         });
@@ -61,13 +65,13 @@ public class CategoryQAPanel extends TitledPane {
             event.consume();
         });
         wrap.setOnDragDropped(event -> {
-            Dragboard db = event.getDragboard();
             boolean success = false;
             if (event.getGestureSource().getClass() == CategoryTree.class) {
                 CategoryTree tree = (CategoryTree) event.getGestureSource();
                 TreeItem<TItem> item =  (TreeItem<TItem>)tree.getSelectionModel().getSelectedItem();
                 if (item != null && item.getValue() != null && item.getValue().getKind() == TreeKind.CATEGORY) {
                     dropTItem(item);
+                    success = true;
                 }
             }
             event.setDropCompleted(success);
@@ -148,6 +152,7 @@ public class CategoryQAPanel extends TitledPane {
         MenuButton addedMB = categoryQAButtons.get(addedKey);
         wrap.getChildren().remove(addedMB);
         wrap.getChildren().add(addedMB);
+        wrap.setMargin(addedMB, new Insets(5, 0, 0, 0));
     }
 
     public void refreshCategoryQA(TreeItem<TItem> ti) {
@@ -161,6 +166,7 @@ public class CategoryQAPanel extends TitledPane {
                     int ndx = wrap.getChildren().indexOf(prevMB);
                     if (ndx > -1) {
                         wrap.getChildren().set(ndx, categoryMB);
+                        wrap.setMargin(categoryMB, new Insets(5, 0, 0, 0));
                         categoryQAButtons.put(updatedTi.getValue().getId(), categoryMB);
                     }
                 }
