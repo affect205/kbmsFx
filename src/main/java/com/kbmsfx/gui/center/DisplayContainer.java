@@ -127,6 +127,7 @@ public class DisplayContainer extends VBox {
             refreshCQAEvent.fire(new RefreshQAEvent(currentTI));
         } else if (currentTI.getValue().getKind() == TreeKind.NOTICE) {
             refreshNQAEvent.fire(new RefreshQAEvent(currentTI));
+            refreshCQAEvent.fire(new RefreshQAEvent(currentTI));
         }
     }
 }

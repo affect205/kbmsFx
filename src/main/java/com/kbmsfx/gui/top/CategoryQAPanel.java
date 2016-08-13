@@ -82,13 +82,8 @@ public class CategoryQAPanel extends TitledPane {
         int code = dataProvider.addCategoryQACache(ti);
         if (code > -1) {
             TItem item = ti.getValue();
-            MenuButton categoryMB = new MenuButton(item.getName());
-            categoryMB.setTooltip(new Tooltip(item.getName()));
-            categoryMB.setMaxWidth(160);
-            categoryMB.setPopupSide(Side.BOTTOM);
-            categoryMB.setUserData(ti);
-            categoryMB.getItems().setAll(buildPath(ti));
-            categoryMB.getItems().add(buildCloseMI(categoryMB));
+            MenuButton categoryMB = buildCategoryMB(ti);
+            if (categoryMB == null) return;
             categoryQAButtons.put(item.getId(), categoryMB);
             refreshPanel(item.getId());
             System.out.printf("Dropped category: %s\n", ti.getValue().toString());
@@ -127,6 +122,18 @@ public class CategoryQAPanel extends TitledPane {
         return closeMI;
     }
 
+    protected MenuButton buildCategoryMB(TreeItem<TItem> ti) {
+        if (ti == null || ti.getValue() == null) return null;
+        MenuButton categoryMB = new MenuButton(ti.getValue().getName());
+        categoryMB.setTooltip(new Tooltip(ti.getValue().getName()));
+        categoryMB.setMaxWidth(160);
+        categoryMB.setPopupSide(Side.BOTTOM);
+        categoryMB.setUserData(ti);
+        categoryMB.getItems().setAll(buildPath(ti));
+        categoryMB.getItems().add(buildCloseMI(categoryMB));
+        return categoryMB;
+    }
+
     protected void refreshPanel(Object addedKey) {
         Deque<TreeItem<TItem>> categoryQACache = dataProvider.getCategoryQACache();
         Set<Object> removedKeys = new HashSet<>();
@@ -141,5 +148,23 @@ public class CategoryQAPanel extends TitledPane {
         MenuButton addedMB = categoryQAButtons.get(addedKey);
         wrap.getChildren().remove(addedMB);
         wrap.getChildren().add(addedMB);
+    }
+
+    public void refreshCategoryQA(TreeItem<TItem> ti) {
+        if (ti == null || ti.getValue() == null) return;
+        Set<TreeItem<TItem>> updated = dataProvider.updateCategoryQACache(ti);
+        for (TreeItem<TItem> updatedTi : updated) {
+            if (categoryQAButtons.containsKey(updatedTi.getValue().getId())) {
+                MenuButton categoryMB = buildCategoryMB(updatedTi);
+                if (categoryMB != null) {
+                    MenuButton prevMB = categoryQAButtons.get(updatedTi.getValue().getId());
+                    int ndx = wrap.getChildren().indexOf(prevMB);
+                    if (ndx > -1) {
+                        wrap.getChildren().set(ndx, categoryMB);
+                        categoryQAButtons.put(updatedTi.getValue().getId(), categoryMB);
+                    }
+                }
+            }
+        }
     }
 }

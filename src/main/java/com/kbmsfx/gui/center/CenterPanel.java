@@ -62,7 +62,8 @@ public class CenterPanel extends BorderPane {
     }
 
     public void refreshCategoryQA(@Observes @QAEvent(QAEvent.QAТуре.CATEGORY)RefreshQAEvent event) {
-        if (event == null || event.getItem() == null || event.getItem().getValue() == null || event.getItem().getValue().getKind() != TreeKind.CATEGORY) return;
-        System.out.println("refreshCategoryQA...");
+        if (event == null || event.getItem() == null || event.getItem().getValue() == null) return;
+        System.out.printf("refreshCategoryQA: %s...\n", event.getItem().getValue().toString());
+        categoryQAPanel.refreshCategoryQA(event.getItem());
     }
 }

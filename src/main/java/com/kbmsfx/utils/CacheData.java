@@ -286,4 +286,25 @@ public class CacheData {
         }
         if (removed != null) categoryQACache.remove(removed);
     }
+
+    public Set<TreeItem<TItem>> updateCategoryQACache(TreeItem<TItem> ti) {
+        if (ti == null || ti.getValue() == null) return null;
+        return categoryQACache.stream()
+                .filter(cacheTi -> updateCategoryQACache(cacheTi, ti))
+                .collect(Collectors.toSet());
+    }
+
+    protected boolean updateCategoryQACache(TreeItem<TItem> parent, TreeItem<TItem> ti) {
+        TItem item =  ti.getValue();
+        if (item.customEquals(parent.getValue())) {
+            parent.getValue().setName(item.getName());
+            return true;
+        }
+        if (parent.getValue().getKind() == TreeKind.CATEGORY) {
+            for (TreeItem<TItem> cacheTi : parent.getChildren()) {
+                if (updateCategoryQACache(cacheTi, ti)) return true;
+            }
+        }
+        return false;
+    }
 }
