@@ -261,7 +261,7 @@ public class CacheData {
     }
 
     /**
-     * @return -1: no addition, 0: addition first, 1: addition first, removal last
+     * @return -1: no addition, 0: addition first, 1: addition first and removal last
      */
     public int addCategoryQACache(TreeItem<TItem> ti) {
         if (ti == null || ti.getValue() == null || ti.getValue().getKind() != TreeKind.CATEGORY) return -1;

@@ -10,7 +10,6 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.control.*;
-import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.FlowPane;
@@ -88,8 +87,7 @@ public class CategoryQAPanel extends TitledPane {
             TItem item = ti.getValue();
             MenuButton categoryMB = buildCategoryMB(ti);
             if (categoryMB == null) return;
-            categoryQAButtons.put(item.getId(), categoryMB);
-            refreshPanel(item.getId());
+            refreshPanel(item.getId(), categoryMB);
             System.out.printf("Dropped category: %s\n", ti.getValue().toString());
         }
     }
@@ -138,20 +136,19 @@ public class CategoryQAPanel extends TitledPane {
         return categoryMB;
     }
 
-    protected void refreshPanel(Object addedKey) {
+    protected void refreshPanel(Object addedKey, MenuButton addedMB) {
         Deque<TreeItem<TItem>> categoryQACache = dataProvider.getCategoryQACache();
         Set<Object> removedKeys = new HashSet<>();
         Set<Object> cacheKeys = categoryQACache.stream().map(ti -> ti.getValue().getId()).collect(Collectors.toSet());
         categoryQAButtons.keySet().forEach(key -> {
-            if (!cacheKeys.contains(key)) removedKeys.add(key);
+            if (!cacheKeys.contains(key) || addedKey.equals(key)) removedKeys.add(key);
         });
         removedKeys.forEach(key -> {
             wrap.getChildren().remove(categoryQAButtons.get(key));
             categoryQAButtons.remove(key);
         });
-        MenuButton addedMB = categoryQAButtons.get(addedKey);
-        wrap.getChildren().remove(addedMB);
-        wrap.getChildren().add(addedMB);
+        categoryQAButtons.put(addedKey, addedMB);
+        wrap.getChildren().add(0, addedMB);
         wrap.setMargin(addedMB, new Insets(5, 0, 0, 0));
     }
 
