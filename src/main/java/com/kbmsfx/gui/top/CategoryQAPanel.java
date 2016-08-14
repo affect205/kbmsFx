@@ -1,10 +1,12 @@
 package com.kbmsfx.gui.top;
 
 import com.kbmsfx.entity.TItem;
+import com.kbmsfx.enums.IconKind;
 import com.kbmsfx.enums.TreeKind;
 import com.kbmsfx.events.SelectRequestEvent;
 import com.kbmsfx.gui.left.CategoryTree;
 import com.kbmsfx.utils.CacheData;
+import com.kbmsfx.utils.GuiUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -97,7 +99,8 @@ public class CategoryQAPanel extends TitledPane {
         current.getChildren().forEach(ti -> {
             TItem child = ti.getValue();
             MenuItem item = child.getKind() == TreeKind.CATEGORY ?
-                    new Menu(child.getName()) : new MenuItem(child.getName());
+                    new Menu(child.getName(), GuiUtils.buildMBIcon(IconKind.CATEGORY)) :
+                    new MenuItem(child.getName(), GuiUtils.buildMBIcon(IconKind.NOTICE));
             item.setUserData(ti);
             if (child.getKind() == TreeKind.CATEGORY) {
                 ((Menu)item).getItems().setAll(buildPath(ti));
@@ -113,7 +116,7 @@ public class CategoryQAPanel extends TitledPane {
     }
 
     protected MenuItem buildCloseMI(MenuButton categoryMB) {
-        MenuItem closeMI = new MenuItem("X Закрыть");
+        MenuItem closeMI = new MenuItem("Закрыть", GuiUtils.buildMBIcon(IconKind.CLOSE));
         closeMI.setOnAction(event -> {
             TreeItem<TItem> ti = (TreeItem<TItem>)categoryMB.getUserData();
             if (ti == null || ti.getValue() == null) return;

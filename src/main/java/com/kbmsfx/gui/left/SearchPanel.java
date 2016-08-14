@@ -36,12 +36,13 @@ public class SearchPanel extends HBox {
     @PostConstruct
     public void init() {
         nameTf = new TextField();
+        nameTf.setMinHeight(32);
         nameTf.setOnKeyPressed(key -> {
             if (key.getCode().equals(KeyCode.ENTER)) {
                 searchBtn.fire();
             }
         });
-        searchBtn = new Button(">");
+        searchBtn = new Button("", GuiUtils.buildIcon(IconKind.SEARCH));
         searchBtn.setTooltip(new Tooltip("Начать поиск"));
         searchBtn.setOnAction(event -> {
             searchTreeEvent.fire(new SearchEvent(nameTf.getText().trim()));

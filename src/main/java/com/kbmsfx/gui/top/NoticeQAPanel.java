@@ -1,8 +1,10 @@
 package com.kbmsfx.gui.top;
 
 import com.kbmsfx.entity.TItem;
+import com.kbmsfx.enums.IconKind;
 import com.kbmsfx.events.SelectRequestEvent;
 import com.kbmsfx.utils.CacheData;
+import com.kbmsfx.utils.GuiUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -85,7 +87,7 @@ public class NoticeQAPanel extends TitledPane {
     }
 
     protected MenuItem buildCloseMI(MenuButton noticeMB) {
-        MenuItem closeMI = new MenuItem("X Закрыть");
+        MenuItem closeMI = new MenuItem("Закрыть", GuiUtils.buildMBIcon(IconKind.CLOSE));
         closeMI.setOnAction(event -> {
             TreeItem<TItem> ti = (TreeItem<TItem>)noticeMB.getUserData();
             if (ti == null || ti.getValue() == null) return;
@@ -96,7 +98,7 @@ public class NoticeQAPanel extends TitledPane {
     }
 
     protected MenuItem buildViewMI(MenuButton noticeMB) {
-        MenuItem viewMI = new MenuItem("V Показать");
+        MenuItem viewMI = new MenuItem("Показать", GuiUtils.buildMBIcon(IconKind.SEARCH));
         viewMI.setOnAction(event -> {
             TreeItem<TItem> ti = (TreeItem<TItem>)noticeMB.getUserData();
             System.out.printf("noticeQA clicked %s\n", ti);

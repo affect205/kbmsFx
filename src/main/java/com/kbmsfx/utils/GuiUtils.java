@@ -23,6 +23,9 @@ public class GuiUtils {
             case SEARCH:
                 path = "icons/search_24.png";
                 break;
+            case CLOSE:
+                path = "icons/close_24.png";
+                break;
         }
         ImageView icon = path == null ? null : new ImageView(new Image(GuiUtils.class.getClassLoader().getResourceAsStream(path)));
         icon.setScaleX(0.7);
@@ -34,6 +37,13 @@ public class GuiUtils {
         ImageView icon = (ImageView) buildIcon(kind);
         icon.setScaleX(scale);
         icon.setScaleY(scale);
+        return icon;
+    }
+
+    public static Node buildMBIcon(IconKind kind) {
+        ImageView icon = (ImageView) buildIcon(kind);
+        icon.setScaleX(0.6);
+        icon.setScaleY(0.6);
         return icon;
     }
 }
