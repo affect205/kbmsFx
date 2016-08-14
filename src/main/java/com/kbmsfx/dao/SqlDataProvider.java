@@ -184,4 +184,30 @@ public class SqlDataProvider implements IDataProvider {
             DBUtils.close(stmt);
         }
     }
+
+    @Override
+    public void changeCategoryParent(int id, int parent) throws Exception {
+        PreparedStatement stmt = null;
+        try {
+            stmt = dbConn.getConnection().prepareStatement("UPDATE category SET parent = ? WHERE id = ?");
+            stmt.setInt(1, parent);
+            stmt.setInt(2, id);
+            stmt.execute();
+        } finally {
+            DBUtils.close(stmt);
+        }
+    }
+
+    @Override
+    public void changeNoticeParent(int id, int parent) throws Exception {
+        PreparedStatement stmt = null;
+        try {
+            stmt = dbConn.getConnection().prepareStatement("UPDATE notice SET categoryid = ? WHERE id = ?");
+            stmt.setInt(1, parent);
+            stmt.setInt(2, id);
+            stmt.execute();
+        } finally {
+            DBUtils.close(stmt);
+        }
+    }
 }

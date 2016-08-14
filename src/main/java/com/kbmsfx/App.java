@@ -39,7 +39,7 @@ public class App extends Application {
 
     public void start(AppLoader loader) {
         System.out.println("start app...");
-        stage.setTitle("HTML");
+        stage.setTitle("Knowledge Base Management System - kbmsFx!");
         stage.setWidth(1200);
         stage.setHeight(680);
         Scene scene = new Scene(new Group());

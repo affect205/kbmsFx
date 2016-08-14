@@ -4,9 +4,10 @@ import com.kbmsfx.annotations.QAEvent;
 import com.kbmsfx.entity.TItem;
 import com.kbmsfx.enums.TreeKind;
 import com.kbmsfx.events.RefreshQAEvent;
+import com.kbmsfx.events.RefreshAllCategoryQAEvent;
 import com.kbmsfx.events.ShowNoticeQAEvent;
 import com.kbmsfx.events.TItemEvent;
-import com.kbmsfx.gui.right.NoticeQAPanel;
+import com.kbmsfx.gui.top.NoticeQAPanel;
 import com.kbmsfx.gui.top.CategoryQAPanel;
 import javafx.scene.control.TreeItem;
 import javafx.scene.layout.BorderPane;
@@ -57,6 +58,12 @@ public class CenterPanel extends BorderPane {
         TreeItem<TItem> ti = event.getItem();
         if (ti == null) return;
         noticeQAPanel.setItem(ti);
+    }
+
+    public void refreshAllCategoryQA(@Observes RefreshAllCategoryQAEvent event) {
+        TreeItem<TItem> ti = event.getItem();
+        if (ti == null) return;
+        categoryQAPanel.refreshAllCategoryQA();
     }
 
     public void refreshNoticeQA(@Observes @QAEvent(QAEvent.QAТуре.NOTICE)RefreshQAEvent event) {

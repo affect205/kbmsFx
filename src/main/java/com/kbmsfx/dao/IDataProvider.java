@@ -20,4 +20,6 @@ public interface IDataProvider {
     void updateNotice(NoticeDTO notice) throws Exception;
     void deleteCategory(Collection<Integer> categoryIds) throws Exception;
     void deleteNotice(int id) throws Exception;
+    void changeCategoryParent(int id, int parent) throws Exception;
+    void changeNoticeParent(int id, int parent) throws Exception;
 }

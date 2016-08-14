@@ -1,4 +1,4 @@
-package com.kbmsfx.gui.right;
+package com.kbmsfx.gui.top;
 
 import com.kbmsfx.entity.TItem;
 import com.kbmsfx.events.SelectRequestEvent;
@@ -25,10 +25,10 @@ import java.util.Map;
 public class NoticeQAPanel extends TitledPane {
 
     @Inject
-    CacheData dataProvider;
+    private CacheData dataProvider;
 
     @Inject
-    Event<SelectRequestEvent> selectRequestEvent;
+    private Event<SelectRequestEvent> selectRequestEvent;
 
     private FlowPane wrap;
     private Map<Object, MenuButton> noticeQAButtons;

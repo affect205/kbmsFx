@@ -83,4 +83,10 @@ public class CassandraDataProvider implements IDataProvider {
     public void updateNotice(NoticeDTO notice) throws Exception {
 
     }
+
+    @Override
+    public void changeCategoryParent(int id, int parent) {}
+
+    @Override
+    public void changeNoticeParent(int id, int parent) {}
 }

@@ -28,17 +28,15 @@ public class CacheData {
     IDataProvider dataProvider;
 
     // category cache
-    Map<Integer, Category> categoryCache;
+    private Map<Integer, Category> categoryCache;
     // notice cache
-    Map<Integer, Notice> noticeCache;
+    private Map<Integer, Notice> noticeCache;
     // tree cache
-    List<TreeItem<TItem>> treeCache;
+    private List<TreeItem<TItem>> treeCache;
     // selected tree categories
-    Deque<TreeItem<TItem>> categoryQACache;
+    private Deque<TreeItem<TItem>> categoryQACache;
     // selected tree notices
-    Deque<TreeItem<TItem>> noticeQACache;
-
-    public CacheData() {}
+    private Deque<TreeItem<TItem>> noticeQACache;
 
     @PostConstruct
     public void init() throws Exception {
@@ -306,5 +304,35 @@ public class CacheData {
             }
         }
         return false;
+    }
+
+    public boolean changeItemCategory(TreeItem<TItem> srcTi, TreeItem<TItem> destTi) {
+        System.out.println("changeItemCategory...");
+        if (srcTi == null || destTi == null || srcTi.getValue() == null) return false;
+        try {
+            TItem srcItem = srcTi.getValue();
+            TItem destItem = destTi.getValue();
+            if (srcItem.getKind() == TreeKind.CATEGORY) {
+                dataProvider.changeCategoryParent(srcItem.getId(), destItem == null ? -1 : destItem.getId());
+                srcTi.getParent().getChildren().remove(srcTi);
+                destTi.getChildren().add(srcTi);
+                Category category = (Category)srcItem;
+                category.setParent((Category)destItem);
+                categoryCache.put(category.getId(), category);
+                return true;
+            } else if (srcItem.getKind() == TreeKind.NOTICE) {
+                dataProvider.changeNoticeParent(srcItem.getId(), destItem == null ? -1 : destItem.getId());
+                srcTi.getParent().getChildren().remove(srcTi);
+                destTi.getChildren().add(srcTi);
+                Notice notice = (Notice)srcItem;
+                notice.setCategory((Category)destItem);
+                noticeCache.put(notice.getId(), notice);
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

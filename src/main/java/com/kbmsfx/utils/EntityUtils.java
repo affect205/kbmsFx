@@ -60,4 +60,14 @@ public class EntityUtils {
         if (item.getKind() == TreeKind.CATEGORY) ti.setExpanded(true);
         return ti;
     }
+
+    public static TItem getParent(TItem item) {
+        if (item == null) return null;
+        if (item.getKind() == TreeKind.CATEGORY) {
+            return ((Category)item).getParent();
+        } else if (item.getKind() == TreeKind.NOTICE) {
+            return((Notice)item).getCategory();
+        }
+        return null;
+    }
 }

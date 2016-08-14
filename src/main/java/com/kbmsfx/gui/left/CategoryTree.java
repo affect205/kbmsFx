@@ -3,6 +3,7 @@ package com.kbmsfx.gui.left;
 import com.kbmsfx.entity.Category;
 import com.kbmsfx.entity.TItem;
 import com.kbmsfx.enums.TreeKind;
+import com.kbmsfx.events.RefreshAllCategoryQAEvent;
 import com.kbmsfx.events.TItemEvent;
 import com.kbmsfx.utils.CacheData;
 import com.kbmsfx.utils.EntityUtils;
@@ -19,6 +20,7 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
+import java.util.Optional;
 
 /**
  * Created by Alex on 15.07.2016.
@@ -31,6 +33,9 @@ public class CategoryTree extends TreeTableView {
 
     @Inject
     private Event<TItemEvent> itemEvent;
+
+    @Inject
+    private Event<RefreshAllCategoryQAEvent> refreshAllCategoryQAEvent;
 
     private TreeItem<TItem> root;
 
@@ -85,7 +90,7 @@ public class CategoryTree extends TreeTableView {
 
     @PostConstruct
     public void init() {
-        root = EntityUtils.buildTreeItem(new Category(-1, "Scientia potentia est"));
+        root = EntityUtils.buildTreeItem(new Category(-1, "Scientia potentia est".toUpperCase()));
         root.setExpanded(true);
         root.getChildren().addAll(dataProvider.getTreeCache());
         setRoot(root);
@@ -95,7 +100,8 @@ public class CategoryTree extends TreeTableView {
         column.setPrefWidth(280);
         column.setResizable(true);
         column.setCellValueFactory((TreeTableColumn.CellDataFeatures<TItem, String> p) -> new ReadOnlyStringWrapper(
-                String.format("%s - %s", p.getValue().getValue().getId(), p.getValue().getValue().getName()))
+                //String.format("%s - %s", p.getValue().getValue().getId(), p.getValue().getValue().getName()))
+                String.format("%s", p.getValue().getValue().getName()))
         );
         getColumns().add(column);
 
@@ -144,9 +150,37 @@ public class CategoryTree extends TreeTableView {
                     boolean success = false;
                     if (event.getDragboard().hasString()) {
                         if (!row.isEmpty()) {
-                            int dropIndex = row.getIndex();
-                            TreeItem<TreeItem<TItem>> droppedon = row.getTreeItem();
-                            success = true;
+                            //int dropIndex = row.getIndex();
+                            TreeItem droppedOn = row.getTreeItem();
+                            if (droppedOn != null && droppedOn.getValue() != null && droppedOn.getValue() instanceof TItem) {
+                                TItem destItem = (TItem)droppedOn.getValue();
+                                System.out.printf("Dest item: %s\n", destItem.toString());
+
+                                if (event.getGestureSource().getClass() == CategoryTree.class) {
+                                    CategoryTree tree = (CategoryTree) event.getGestureSource();
+                                    TreeItem<TItem> ti =  (TreeItem<TItem>)tree.getSelectionModel().getSelectedItem();
+                                    if (ti != null && ti.getValue() != null) {
+                                        TItem srcItem = ti.getValue();
+                                        System.out.printf("Source item: %s\n", srcItem.toString());
+
+                                        if (destItem.getKind() == TreeKind.CATEGORY && !destItem.customEquals(EntityUtils.getParent(srcItem))) {
+                                            String kindDesc = srcItem.getKind() == TreeKind.CATEGORY ? "категорию": "запись";
+                                            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+                                            confirm.setTitle("Смена категории");
+                                            confirm.setContentText(String.format("Переместить %s \"%s\" в категорию \"%s\"?",
+                                                    kindDesc, srcItem.getName(), destItem.getName()));
+                                            confirm.setHeaderText(null);
+                                            Optional<ButtonType> result = confirm.showAndWait();
+                                            if (result.get() == ButtonType.OK) {
+                                                if (dataProvider.changeItemCategory(ti, droppedOn)) {
+                                                    refreshAllCategoryQAEvent.fire(new RefreshAllCategoryQAEvent(ti));
+                                                    success = true;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                     event.setDropCompleted(success);

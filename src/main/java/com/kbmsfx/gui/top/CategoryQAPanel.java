@@ -31,7 +31,7 @@ public class CategoryQAPanel extends TitledPane {
     private CacheData dataProvider;
 
     @Inject
-    Event<SelectRequestEvent> selectRequestEvent;
+    private Event<SelectRequestEvent> selectRequestEvent;
 
     private Map<Object, MenuButton> categoryQAButtons;
     private FlowPane wrap;
@@ -168,6 +168,13 @@ public class CategoryQAPanel extends TitledPane {
                     }
                 }
             }
+        }
+    }
+
+    public void refreshAllCategoryQA() {
+        System.out.println("refreshAllCategoryQA...");
+        for (TreeItem<TItem> cacheTi : dataProvider.getCategoryQACache()) {
+            refreshCategoryQA(cacheTi);
         }
     }
 }
