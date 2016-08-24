@@ -10,3 +10,7 @@
 /*.iconNotice > .label {*/
     /*-fx-graphic: url("icons/write_64.png");*/
 /*}*/
+
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: whitesmoke;
+}

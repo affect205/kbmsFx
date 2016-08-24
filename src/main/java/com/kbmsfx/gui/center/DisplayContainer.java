@@ -4,16 +4,13 @@ import com.kbmsfx.annotations.QAEvent;
 import com.kbmsfx.entity.Notice;
 import com.kbmsfx.entity.TItem;
 import com.kbmsfx.enums.TreeKind;
-import com.kbmsfx.events.ShowNoticeQAEvent;
 import com.kbmsfx.events.RefreshQAEvent;
 import com.kbmsfx.events.RefreshTreeEvent;
+import com.kbmsfx.events.ShowNoticeQAEvent;
 import com.kbmsfx.utils.CacheData;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
-import javafx.scene.control.TreeItem;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -34,7 +31,9 @@ public class DisplayContainer extends VBox {
     private VBox wrap;
     private TextField nameTf;
     private HTMLEditor contentHE;
+    private TextArea contentTa;
     private TitledPane titledPane;
+    private TabPane tabPane;
     private HBox toolbar;
 
     private TreeItem<TItem> currentTI;
@@ -67,12 +66,36 @@ public class DisplayContainer extends VBox {
 
         nameTf = new TextField("");
 
+        contentTa = new TextArea();
+        contentTa.setWrapText(true);
+
         contentHE = new HTMLEditor();
-        contentHE.setPrefHeight(600);
-        contentHE.setHtmlText("");
+
+        Tab viewTab = new Tab("Просмотр");
+        viewTab.setContent(contentHE);
+        viewTab.setClosable(false);
+        Tab editTab = new Tab();
+        editTab.setText("Редактирование");
+        editTab.setContent(contentTa);
+        editTab.setClosable(false);
+
+        tabPane = new TabPane();
+        tabPane.getTabs().add(viewTab);
+        tabPane.getTabs().add(editTab);
+        tabPane.getStylesheets().add("tab-header-background");
+        tabPane.getSelectionModel().selectedItemProperty().addListener(
+                (ov, t, t1) -> {
+                    System.out.printf("old: %s, new: %s\n", t.getText(), t1.getText());
+                    if (viewTab.equals(t1)) {
+                        contentHE.setHtmlText(contentTa.getText());
+                    } else if (editTab.equals(t1)) {
+                        contentTa.setText(contentHE.getHtmlText());
+                    }
+                }
+        );
 
         wrap = new VBox();
-        wrap.getChildren().setAll(nameTf, contentHE);
+        wrap.getChildren().setAll(nameTf, tabPane);
         VBox.setMargin(nameTf, new Insets(0, 0, 10, 0));
 
         titledPane = new TitledPane("Просмотр", wrap);
@@ -83,7 +106,7 @@ public class DisplayContainer extends VBox {
         setMargin(titledPane, new Insets(10, 10, 0, 10));
 
         getChildren().add(titledPane);
-        getChildren().add(buildToolbar());
+        getChildren().add(toolbar);
     }
 
     public void setItem(TreeItem<TItem> ti) {
@@ -94,11 +117,11 @@ public class DisplayContainer extends VBox {
         if (currentItem.getKind() == TreeKind.NOTICE) {
             Notice notice = (Notice)currentItem;
             contentHE.setHtmlText(notice.getContent());
-            contentHE.setDisable(false);
+            tabPane.setDisable(false);
             noticeQAEvent.fire(new ShowNoticeQAEvent(ti));
         } else {
             contentHE.setHtmlText("");
-            contentHE.setDisable(true);
+            tabPane.setDisable(true);
         }
     }
 

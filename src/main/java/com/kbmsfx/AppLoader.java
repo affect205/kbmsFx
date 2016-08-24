@@ -5,6 +5,7 @@ package com.kbmsfx;
  * User: Alexey Balyschev
  * Date: 10.07.16
  */
+import com.kbmsfx.events.OnLoadEvent;
 import com.kbmsfx.gui.left.LeftPanel;
 import com.kbmsfx.gui.center.CenterPanel;
 import com.kbmsfx.utils.CacheData;
@@ -15,6 +16,7 @@ import javafx.scene.layout.Pane;
 import org.jboss.weld.environment.se.events.ContainerInitialized;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
@@ -30,6 +32,9 @@ public class AppLoader {
     @Inject
     private CenterPanel centerPanel;
 
+    @Inject
+    private Event<OnLoadEvent> onLoadEvent;
+
     public static void main(String[] args) {
         System.out.println("launch app...");
         Application.launch(App.class, args);
@@ -38,6 +43,7 @@ public class AppLoader {
     public void start(@Observes ContainerInitialized startEvent) {
         System.out.println("start app from CDI container...");
         App.getInstance().start(this);
+        onLoadEvent.fire(new OnLoadEvent());
     }
 
     public Pane buildCenter() {

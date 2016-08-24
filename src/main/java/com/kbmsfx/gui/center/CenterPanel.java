@@ -3,10 +3,7 @@ package com.kbmsfx.gui.center;
 import com.kbmsfx.annotations.QAEvent;
 import com.kbmsfx.entity.TItem;
 import com.kbmsfx.enums.TreeKind;
-import com.kbmsfx.events.RefreshQAEvent;
-import com.kbmsfx.events.RefreshAllCategoryQAEvent;
-import com.kbmsfx.events.ShowNoticeQAEvent;
-import com.kbmsfx.events.TItemEvent;
+import com.kbmsfx.events.*;
 import com.kbmsfx.gui.top.NoticeQAPanel;
 import com.kbmsfx.gui.top.CategoryQAPanel;
 import javafx.scene.control.TreeItem;
@@ -44,7 +41,7 @@ public class CenterPanel extends BorderPane {
         HBox topQA = new HBox(categoryQAPanel, noticeQAPanel);
         HBox.setHgrow(categoryQAPanel, Priority.ALWAYS);
         HBox.setHgrow(noticeQAPanel, Priority.ALWAYS);
-        setTop(topQA);
+        setBottom(topQA);
     }
 
     public void itemSelected(@Observes TItemEvent event) {

@@ -111,7 +111,6 @@
             <version>8.0-r5</version>
         </dependency>
 
-
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -121,6 +120,12 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.7.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.fxmisc.richtext</groupId>
+            <artifactId>richtextfx</artifactId>
+            <version>0.6.10</version>
         </dependency>
     </dependencies>
 
