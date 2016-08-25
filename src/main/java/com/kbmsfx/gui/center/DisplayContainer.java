@@ -8,11 +8,15 @@ import com.kbmsfx.events.RefreshQAEvent;
 import com.kbmsfx.events.RefreshTreeEvent;
 import com.kbmsfx.events.ShowNoticeQAEvent;
 import com.kbmsfx.utils.CacheData;
+import com.kbmsfx.utils.UrlUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.HTMLEditor;
 
@@ -35,6 +39,9 @@ public class DisplayContainer extends VBox {
     private TitledPane titledPane;
     private TabPane tabPane;
     private HBox toolbar;
+    private TextField urlTf;
+    private Button loadBtn;
+    private Button saveBtn;
 
     private TreeItem<TItem> currentTI;
 
@@ -65,6 +72,11 @@ public class DisplayContainer extends VBox {
         toolbar = buildToolbar();
 
         nameTf = new TextField("");
+        nameTf.setOnKeyPressed(key -> {
+            if (key.getCode().equals(KeyCode.ENTER)) {
+                saveBtn.fire();
+            }
+        });
 
         contentTa = new TextArea();
         contentTa.setWrapText(true);
@@ -82,6 +94,7 @@ public class DisplayContainer extends VBox {
         tabPane = new TabPane();
         tabPane.getTabs().add(viewTab);
         tabPane.getTabs().add(editTab);
+        tabPane.setSide(Side.LEFT);
         tabPane.getStylesheets().add("tab-header-background");
         tabPane.getSelectionModel().selectedItemProperty().addListener(
                 (ov, t, t1) -> {
@@ -114,26 +127,45 @@ public class DisplayContainer extends VBox {
         currentTI = ti;
         TItem currentItem = ti.getValue();
         nameTf.setText(currentItem.getName());
+        urlTf.setText("http://");
         if (currentItem.getKind() == TreeKind.NOTICE) {
             Notice notice = (Notice)currentItem;
             contentHE.setHtmlText(notice.getContent());
+            contentTa.setText(notice.getContent());
             tabPane.setDisable(false);
+            loadBtn.setDisable(false);
             noticeQAEvent.fire(new ShowNoticeQAEvent(ti));
         } else {
             contentHE.setHtmlText("");
+            contentTa.setText("");
             tabPane.setDisable(true);
+            loadBtn.setDisable(true);
         }
     }
 
     protected HBox buildToolbar() {
-        Button saveBtn = new Button("Сохранить");
+        loadBtn = new Button("Загрузить");
+        loadBtn.setOnAction(actionEvent -> {
+            loadData();
+        });
+
+        urlTf = new TextField("http://");
+        urlTf.setPrefWidth(210);
+        urlTf.setOnKeyPressed(key -> {
+            if (key.getCode().equals(KeyCode.ENTER)) {
+                loadBtn.fire();
+            }
+        });
+
+        saveBtn = new Button("Сохранить");
         saveBtn.setOnAction(actionEvent -> {
             saveData();
         });
-        saveBtn.setPrefWidth(120);
-        HBox topToolbar = new HBox(saveBtn);
-        topToolbar.setAlignment(Pos.BASELINE_RIGHT);
-        VBox.setMargin(topToolbar, new Insets(10, 10, 10, 0));
+        saveBtn.setMaxWidth(120);
+        HBox spacer = new HBox();
+        HBox topToolbar = new HBox(urlTf, loadBtn, spacer, saveBtn);
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        VBox.setMargin(topToolbar, new Insets(10, 10, 0, 10));
         return topToolbar;
     }
 
@@ -152,5 +184,11 @@ public class DisplayContainer extends VBox {
             refreshNQAEvent.fire(new RefreshQAEvent(currentTI));
             refreshCQAEvent.fire(new RefreshQAEvent(currentTI));
         }
+    }
+
+    protected void loadData() {
+        String html = UrlUtils.loadHtml(urlTf.getText().trim());
+        contentHE.setHtmlText(html);
+        contentTa.setText(html);
     }
 }
