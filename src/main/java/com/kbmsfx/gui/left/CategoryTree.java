@@ -10,13 +10,10 @@ import com.kbmsfx.utils.CacheData;
 import com.kbmsfx.utils.EntityUtils;
 import com.kbmsfx.utils.GuiUtils;
 import com.kbmsfx.utils.StringUtils;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.scene.control.*;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.TransferMode;
-import javafx.util.Callback;
+import javafx.scene.input.*;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
@@ -102,7 +99,6 @@ public class CategoryTree extends TreeTableView {
         column.setPrefWidth(280);
         column.setResizable(true);
         column.setCellValueFactory((TreeTableColumn.CellDataFeatures<TItem, String> p) -> new ReadOnlyStringWrapper(
-                //String.format("%s - %s", p.getValue().getValue().getId(), p.getValue().getValue().getName()))
                 String.format("%s", p.getValue().getValue().getName()))
         );
         getColumns().add(column);
@@ -121,75 +117,39 @@ public class CategoryTree extends TreeTableView {
             }
         });
 
-        setRowFactory(new Callback<TreeTableView, TreeTableRow<TreeItem<TItem>>>() {
-            @Override
-            public TreeTableRow<TreeItem<TItem>> call(final TreeTableView param) {
-                final TreeTableRow<TreeItem<TItem>> row = new TreeTableRow<>();
+        setRowFactory(param -> {
+            final TreeTableRow<TreeItem<TItem>> row = new TreeTableRow<>();
 
-                // Drag and Drop
-                row.setOnDragDetected(event -> {
-                    TreeItem<TItem> selected = (TreeItem<TItem>) getSelectionModel().getSelectedItem();
-                    // @TODO think about DnD for filtered data
-                    if (selected != null && !isFiltered) {
-                        Dragboard db = CategoryTree.this.startDragAndDrop(TransferMode.ANY);
-                        db.setDragView(row.snapshot(null, null));
+            row.setOnDragDetected(event -> {
+                TreeItem<TItem> selected = (TreeItem<TItem>) getSelectionModel().getSelectedItem();
+                // @TODO think about DnD for filtered data
+                if (selected != null && !isFiltered) {
+                    Dragboard db = CategoryTree.this.startDragAndDrop(TransferMode.ANY);
+                    db.setDragView(row.snapshot(null, null));
 
-                        ClipboardContent content = new ClipboardContent();
-                        content.putString(selected.getValue().getName());
-                        db.setContent(content);
-                        event.consume();
-                    }
-                });
-                row.setOnDragOver(event -> {
-                    Dragboard db = event.getDragboard();
-                    if (event.getDragboard().hasString()) {
-                        event.acceptTransferModes(TransferMode.MOVE);
-                    }
+                    ClipboardContent content = new ClipboardContent();
+                    content.putString(selected.getValue().getName());
+                    db.setContent(content);
                     event.consume();
-                });
-                row.setOnDragDropped(event -> {
-                    Dragboard db = event.getDragboard();
-                    boolean success = false;
-                    if (event.getDragboard().hasString()) {
-                        if (!row.isEmpty()) {
-                            TreeItem droppedOn = row.getTreeItem();
-                            if (droppedOn != null && droppedOn.getValue() != null && droppedOn.getValue() instanceof TItem) {
-                                TItem destItem = (TItem)droppedOn.getValue();
-                                System.out.printf("Dest item: %s\n", destItem.toString());
+                }
+            });
+            row.setOnDragOver(event -> {
+                Dragboard db = event.getDragboard();
+                if (event.getDragboard().hasString()) {
+                    event.acceptTransferModes(TransferMode.MOVE);
+                }
+                event.consume();
+            });
+            row.setOnDragDropped(event -> {
+                boolean openDialog = event.getDragboard().hasString() && !row.isEmpty() ? true : false;
+                event.setDropCompleted(true);
+                event.consume();
+                if (openDialog) {
+                    Platform.runLater(() -> openDialog(row.getTreeItem(), event));
+                }
+            });
 
-                                if (event.getGestureSource().getClass() == CategoryTree.class) {
-                                    CategoryTree tree = (CategoryTree) event.getGestureSource();
-                                    TreeItem<TItem> ti =  (TreeItem<TItem>)tree.getSelectionModel().getSelectedItem();
-                                    if (ti != null && ti.getValue() != null) {
-                                        TItem srcItem = ti.getValue();
-                                        System.out.printf("Source item: %s\n", srcItem.toString());
-
-                                        if (destItem.getKind() == TreeKind.CATEGORY && !destItem.customEquals(EntityUtils.getParent(srcItem))) {
-                                            String kindDesc = srcItem.getKind() == TreeKind.CATEGORY ? "категорию": "запись";
-                                            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-                                            confirm.setTitle("Смена категории");
-                                            confirm.setContentText(String.format("Переместить %s \"%s\" в категорию \"%s\"?",
-                                                    kindDesc, srcItem.getName(), destItem.getName()));
-                                            confirm.setHeaderText(null);
-                                            Optional<ButtonType> result = confirm.showAndWait();
-                                            if (result.get() == ButtonType.OK) {
-                                                if (dataProvider.changeItemCategory(ti, droppedOn)) {
-                                                    refreshAllCategoryQAEvent.fire(new RefreshAllCategoryQAEvent(ti));
-                                                    success = true;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    event.setDropCompleted(success);
-                    event.consume();
-                });
-
-                return row;
-            }
+            return row;
         });
     }
 
@@ -216,7 +176,6 @@ public class CategoryTree extends TreeTableView {
         }
     }
 
-
     protected void filter(TreeItem<TItem> root, String filter, TreeItem<TItem> filteredRoot) {
         for (TreeItem<TItem> child : root.getChildren()) {
             TreeItem<TItem> filteredChild = EntityUtils.buildTreeItem(child.getValue());
@@ -232,7 +191,35 @@ public class CategoryTree extends TreeTableView {
         return value != null && value.getName().toLowerCase().contains(filter.toLowerCase().trim());
     }
 
-    protected void openDialog() {
+    protected void openDialog(TreeItem droppedOn, DragEvent event) {
+        if (droppedOn != null && droppedOn.getValue() != null && droppedOn.getValue() instanceof TItem) {
+            TItem destItem = (TItem)droppedOn.getValue();
+            System.out.printf("Dest item: %s\n", destItem.toString());
 
+            if (event.getGestureSource().getClass() == CategoryTree.class) {
+                CategoryTree tree = (CategoryTree) event.getGestureSource();
+                TreeItem<TItem> ti =  (TreeItem<TItem>)tree.getSelectionModel().getSelectedItem();
+                if (ti != null && ti.getValue() != null) {
+                    TItem srcItem = ti.getValue();
+                    System.out.printf("Source item: %s\n", srcItem.toString());
+
+                    if (destItem.getKind() == TreeKind.CATEGORY && !destItem.customEquals(EntityUtils.getParent(srcItem))) {
+                        String kindDesc = srcItem.getKind() == TreeKind.CATEGORY ? "категорию": "запись";
+                        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+                        confirm.setTitle("Смена категории");
+                        confirm.setContentText(String.format("Переместить %s \"%s\" в категорию \"%s\"?",
+                                kindDesc, srcItem.getName(), destItem.getName()));
+                        confirm.setHeaderText(null);
+                        Optional<ButtonType> result = confirm.showAndWait();
+                        if (result.get() == ButtonType.OK) {
+                            if (dataProvider.changeItemCategory(ti, droppedOn)) {
+                                refreshAllCategoryQAEvent.fire(new RefreshAllCategoryQAEvent(ti));
+                                refresh();
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

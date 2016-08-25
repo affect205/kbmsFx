@@ -176,8 +176,6 @@ public class CategoryQAPanel extends TitledPane {
 
     public void refreshAllCategoryQA() {
         System.out.println("refreshAllCategoryQA...");
-        for (TreeItem<TItem> cacheTi : dataProvider.getCategoryQACache()) {
-            refreshCategoryQA(cacheTi);
-        }
+        dataProvider.getCategoryQACache().forEach(this::refreshCategoryQA);
     }
 }

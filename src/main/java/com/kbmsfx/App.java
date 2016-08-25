@@ -40,8 +40,8 @@ public class App extends Application {
     public void start(AppLoader loader) {
         System.out.println("start app...");
         stage.setTitle("Knowledge Base Management System - kbmsFx!");
-        stage.setWidth(1200);
-        stage.setHeight(680);
+        stage.setWidth(1280);
+        stage.setHeight(720);
         Scene scene = new Scene(new Group());
 
         URL url = this.getClass().getClassLoader().getResource("custom.css");

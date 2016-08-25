@@ -3,6 +3,7 @@ package com.kbmsfx.gui.left;
 import com.kbmsfx.events.RefreshTreeEvent;
 import com.kbmsfx.events.SearchEvent;
 import com.kbmsfx.events.SelectRequestEvent;
+import javafx.geometry.Insets;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
@@ -31,6 +32,8 @@ public class LeftPanel extends VBox {
     protected void init() {
         getChildren().setAll(searchPanel, categoryTree);
         VBox.setVgrow(categoryTree, Priority.ALWAYS);
+        setMargin(searchPanel, new Insets(10, 0, 10, 10));
+        setMargin(categoryTree, new Insets(0, 0, 10, 10));
     }
 
     public void refreshTree(@Observes RefreshTreeEvent event) {
