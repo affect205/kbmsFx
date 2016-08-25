@@ -37,6 +37,12 @@ public class GuiUtils {
             case DELETE:
                 path = Foundation.X;
                 break;
+            case CONTENT_VIEW:
+                path = Foundation.EYE;
+                break;
+            case CONTENT_EDIT:
+                path = Foundation.HTML5;
+                break;
         }
 
         if (path == null) return null;

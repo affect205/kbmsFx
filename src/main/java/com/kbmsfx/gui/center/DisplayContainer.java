@@ -3,11 +3,13 @@ package com.kbmsfx.gui.center;
 import com.kbmsfx.annotations.QAEvent;
 import com.kbmsfx.entity.Notice;
 import com.kbmsfx.entity.TItem;
+import com.kbmsfx.enums.IconKind;
 import com.kbmsfx.enums.TreeKind;
 import com.kbmsfx.events.RefreshQAEvent;
 import com.kbmsfx.events.RefreshTreeEvent;
 import com.kbmsfx.events.ShowNoticeQAEvent;
 import com.kbmsfx.utils.CacheData;
+import com.kbmsfx.utils.GuiUtils;
 import com.kbmsfx.utils.UrlUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -84,10 +86,11 @@ public class DisplayContainer extends VBox {
         contentHE = new HTMLEditor();
 
         Tab viewTab = new Tab("Просмотр");
+        viewTab.setGraphic(GuiUtils.buildIcon(IconKind.CONTENT_VIEW));
         viewTab.setContent(contentHE);
         viewTab.setClosable(false);
-        Tab editTab = new Tab();
-        editTab.setText("Редактирование");
+        Tab editTab = new Tab("Редактирование");
+        editTab.setGraphic(GuiUtils.buildIcon(IconKind.CONTENT_EDIT));
         editTab.setContent(contentTa);
         editTab.setClosable(false);
 
