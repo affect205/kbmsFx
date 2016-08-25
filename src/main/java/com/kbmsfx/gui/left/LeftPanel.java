@@ -13,7 +13,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 /**
- * Created by Alex on 27.07.2016.
+ * Created by Alex Balyschev on 27.07.2016.
  */
 @Singleton
 public class LeftPanel extends VBox {

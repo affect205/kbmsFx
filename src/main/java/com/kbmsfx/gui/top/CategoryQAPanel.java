@@ -24,7 +24,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Created by Alex on 15.07.2016.
+ * Created by Alex Balyschev on 15.07.2016.
  */
 @Dependent
 public class CategoryQAPanel extends TitledPane {

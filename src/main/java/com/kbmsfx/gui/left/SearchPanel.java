@@ -18,7 +18,7 @@ import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
 /**
- * Created by Alex on 27.07.2016.
+ * Created by Alex Balyschev on 27.07.2016.
  */
 @Dependent
 public class SearchPanel extends HBox {

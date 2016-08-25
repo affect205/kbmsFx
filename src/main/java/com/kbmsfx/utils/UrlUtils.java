@@ -7,7 +7,7 @@ import java.net.URLConnection;
 import java.nio.charset.Charset;
 
 /**
- * Created by abalyshev on 24.08.16.
+ * Created by Alex Balyschev on 24.08.16.
  */
 public class UrlUtils {
 

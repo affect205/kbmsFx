@@ -5,7 +5,7 @@ import com.kbmsfx.enums.TreeKind;
 import javafx.scene.control.TreeItem;
 
 /**
- * Created by Alex on 06.08.2016.
+ * Created by Alex Balyschev on 06.08.2016.
  */
 public class ShowNoticeQAEvent {
 

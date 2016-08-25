@@ -7,7 +7,7 @@ import org.kordamp.ikonli.foundation.Foundation;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 /**
- * Created by Alex on 07.08.2016.
+ * Created by Alex Balyschev on 07.08.2016.
  */
 public class GuiUtils {
 

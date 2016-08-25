@@ -1,7 +1,7 @@
 package com.kbmsfx.enums;
 
 /**
- * Created by Alex on 07.08.2016.
+ * Created by Alex Balyschev on 07.08.2016.
  */
 public enum  IconKind {
     CATEGORY,

@@ -23,7 +23,7 @@ import javax.inject.Inject;
 import java.util.Optional;
 
 /**
- * Created by Alex on 15.07.2016.
+ * Created by Alex Balyschev on 15.07.2016.
  */
 @Dependent
 public class CategoryTree extends TreeTableView {

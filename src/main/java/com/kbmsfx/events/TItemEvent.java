@@ -4,7 +4,7 @@ import com.kbmsfx.entity.TItem;
 import javafx.scene.control.TreeItem;
 
 /**
- * Created by Alex on 16.07.2016.
+ * Created by Alex Balyschev on 16.07.2016.
  */
 public class TItemEvent {
 

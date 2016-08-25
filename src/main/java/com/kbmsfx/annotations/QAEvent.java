@@ -1,7 +1,7 @@
 package com.kbmsfx.annotations;
 
 /**
- * Created by Alex on 08.08.2016.
+ * Created by Alex Balyschev on 08.08.2016.
  */
 
 import javax.inject.Qualifier;

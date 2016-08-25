@@ -29,7 +29,7 @@ import javax.inject.Inject;
 import java.util.Date;
 
 /**
- * Created by Alex on 16.07.2016.
+ * Created by Alex Balyschev on 16.07.2016.
  */
 @Dependent
 public class DisplayContainer extends VBox {

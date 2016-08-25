@@ -10,7 +10,7 @@ import org.jboss.weld.environment.se.Weld;
 import java.net.URL;
 
 /**
- * Created by Alex on 16.07.2016.
+ * Created by Alex Balyschev on 16.07.2016.
  */
 public class App extends Application {
 

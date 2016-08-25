@@ -17,7 +17,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 /**
- * Created by Alex on 17.07.2016.
+ * Created by Alex Balyschev on 17.07.2016.
  */
 @Singleton
 public class CenterPanel extends BorderPane {

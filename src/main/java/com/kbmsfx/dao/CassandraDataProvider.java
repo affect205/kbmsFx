@@ -15,7 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by abalyshev on 18.07.16.
+ * Created by Alex Balyschev on 18.07.16.
  */
 @Dependent
 @Alternative

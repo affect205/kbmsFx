@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by Alex on 15.07.2016.
+ * Created by Alex Balyschev on 15.07.2016.
  */
 @Dependent
 public class NoticeQAPanel extends TitledPane {

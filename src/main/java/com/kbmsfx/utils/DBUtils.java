@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
- * User: Alex
+ * User: Alex Balyschev
  * Date: 12.07.16
  */
 public class DBUtils {

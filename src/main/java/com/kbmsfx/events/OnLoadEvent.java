@@ -3,7 +3,7 @@ package com.kbmsfx.events;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * Created by abalyshev on 24.08.16.
+ * Created by Alex Balyschev on 24.08.16.
  */
 public class OnLoadEvent {
     private int id;
