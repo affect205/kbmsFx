@@ -1,6 +1,7 @@
 package com.kbmsfx.gui.left;
 
 import com.kbmsfx.entity.Category;
+import com.kbmsfx.entity.Notice;
 import com.kbmsfx.entity.TItem;
 import com.kbmsfx.enums.IconKind;
 import com.kbmsfx.enums.TreeKind;
@@ -98,9 +99,19 @@ public class CategoryTree extends TreeTableView {
         TreeTableColumn<TItem, String> column = new TreeTableColumn<>("Дерево знаний");
         column.setPrefWidth(280);
         column.setResizable(true);
-        column.setCellValueFactory((TreeTableColumn.CellDataFeatures<TItem, String> p) -> new ReadOnlyStringWrapper(
-                String.format("%s", p.getValue().getValue().getName()))
-        );
+        column.setCellValueFactory((TreeTableColumn.CellDataFeatures<TItem, String> p) -> {
+            String name = "";
+            try {
+                name = p.getValue().getValue().getName();
+            } catch (Exception e) {
+                try {
+                    name = p.getValue().getChildren().get(0).getValue().getName();
+                } catch (Exception e2) {
+                    name = "error!";
+                }
+            }
+            return new ReadOnlyStringWrapper(name);
+        });
         getColumns().add(column);
 
         getSelectionModel().selectedItemProperty().addListener((observableValue, oldSelection, newSelection) -> {
@@ -163,17 +174,19 @@ public class CategoryTree extends TreeTableView {
         }
     }
 
-    protected void filterBy(String filter) {
+    public void filterBy(String filter) {
         if (StringUtils.isEmpty(filter)) {
             setRoot(root);
             isFiltered = false;
         }
         else {
             TreeItem<TItem> filteredRoot = new TreeItem<>();
+            filteredRoot.setExpanded(true);
             filter(root, filter, filteredRoot);
             setRoot(filteredRoot);
             isFiltered = true;
         }
+        refresh();
     }
 
     protected void filter(TreeItem<TItem> root, String filter, TreeItem<TItem> filteredRoot) {
@@ -188,7 +201,13 @@ public class CategoryTree extends TreeTableView {
     }
 
     protected boolean isMatch(TItem value, String filter) {
-        return value != null && value.getName().toLowerCase().contains(filter.toLowerCase().trim());
+        if (value == null) return false;
+        boolean nameMatch = value.getName().toLowerCase().contains(filter.toLowerCase().trim());
+        if (value.getKind() == TreeKind.NOTICE) {
+            String content = ((Notice)value).getContent();
+            return nameMatch || content.toLowerCase().contains(filter.toLowerCase().trim());
+        }
+        return nameMatch;
     }
 
     protected void openDialog(TreeItem droppedOn, DragEvent event) {
