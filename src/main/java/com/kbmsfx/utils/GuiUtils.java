@@ -2,8 +2,9 @@ package com.kbmsfx.utils;
 
 import com.kbmsfx.enums.IconKind;
 import javafx.scene.Node;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.paint.Color;
+import org.kordamp.ikonli.foundation.Foundation;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 /**
  * Created by Alex on 07.08.2016.
@@ -11,39 +12,42 @@ import javafx.scene.image.ImageView;
 public class GuiUtils {
 
     public static Node buildIcon(IconKind kind) {
-        String path = null;
+        Foundation path = null;
+        Color color = Color.LIGHTSLATEGRAY;
 
         switch (kind) {
             case CATEGORY:
-                path = "icons/folder_24.png";
+                path = Foundation.FOLDER;
                 break;
             case NOTICE:
-                path = "icons/notice_24.png";
+                path = Foundation.CLIPBOARD_PENCIL;
                 break;
             case SEARCH:
-                path = "icons/search_24.png";
+                path = Foundation.MAGNIFYING_GLASS;
                 break;
             case CLOSE:
-                path = "icons/close_24.png";
+                path = Foundation.X;
+                break;
+            case USER:
+                path = Foundation.TORSO;
+                break;
+            case CATEGORY_ADD:
+                path = Foundation.FOLDER_ADD;
+                break;
+            case DELETE:
+                path = Foundation.X;
                 break;
         }
-        ImageView icon = path == null ? null : new ImageView(new Image(GuiUtils.class.getClassLoader().getResourceAsStream(path)));
-        icon.setScaleX(0.7);
-        icon.setScaleY(0.7);
-        return icon;
-    }
 
-    public static Node buildIcon(IconKind kind, double scale) {
-        ImageView icon = (ImageView) buildIcon(kind);
-        icon.setScaleX(scale);
-        icon.setScaleY(scale);
+        if (path == null) return null;
+        FontIcon icon = new FontIcon(path);
+        icon.setIconSize(18);
+        icon.setIconColor(color);
         return icon;
     }
 
     public static Node buildMBIcon(IconKind kind) {
-        ImageView icon = (ImageView) buildIcon(kind);
-        icon.setScaleX(0.6);
-        icon.setScaleY(0.6);
+        FontIcon icon = (FontIcon) buildIcon(kind);
         return icon;
     }
 }

@@ -2,11 +2,13 @@ package com.kbmsfx.gui.left;
 
 import com.kbmsfx.entity.Category;
 import com.kbmsfx.entity.TItem;
+import com.kbmsfx.enums.IconKind;
 import com.kbmsfx.enums.TreeKind;
 import com.kbmsfx.events.RefreshAllCategoryQAEvent;
 import com.kbmsfx.events.TItemEvent;
 import com.kbmsfx.utils.CacheData;
 import com.kbmsfx.utils.EntityUtils;
+import com.kbmsfx.utils.GuiUtils;
 import com.kbmsfx.utils.StringUtils;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.scene.control.*;
@@ -48,7 +50,7 @@ public class CategoryTree extends TreeTableView {
     public CategoryTree() {
         super();
         contextMenu = new ContextMenu();
-        addCatMenuItem = new MenuItem("+ Добавить категорию");
+        addCatMenuItem = new MenuItem("Добавить категорию", GuiUtils.buildMBIcon(IconKind.CATEGORY_ADD));
         addCatMenuItem.setOnAction(event -> {
             TreeItem<TItem> selected = (TreeItem<TItem>)getSelectionModel().getSelectedItem();
             if (selected.getValue() == null) return;
@@ -60,7 +62,7 @@ public class CategoryTree extends TreeTableView {
                 selected.getChildren().add(EntityUtils.buildTreeItem(newItem));
             } catch (Exception e) { e.printStackTrace(); }
         });
-        addNotMenuItem = new MenuItem("+ Добавить запись");
+        addNotMenuItem = new MenuItem("Добавить запись", GuiUtils.buildMBIcon(IconKind.NOTICE));
         addNotMenuItem.setOnAction(event -> {
             TreeItem<TItem> selected = (TreeItem<TItem>)getSelectionModel().getSelectedItem();
             if (selected.getValue() == null) return;
@@ -72,7 +74,7 @@ public class CategoryTree extends TreeTableView {
                 selected.getChildren().add(EntityUtils.buildTreeItem(newItem));
             } catch (Exception e) { e.printStackTrace(); }
         });
-        removeMenuItem = new MenuItem("- Удалить");
+        removeMenuItem = new MenuItem("Удалить", GuiUtils.buildMBIcon(IconKind.DELETE));
         removeMenuItem.setOnAction(event -> {
             TreeItem<TItem> selected = (TreeItem<TItem>)getSelectionModel().getSelectedItem();
             if (selected.getValue() == null) return;
@@ -150,7 +152,6 @@ public class CategoryTree extends TreeTableView {
                     boolean success = false;
                     if (event.getDragboard().hasString()) {
                         if (!row.isEmpty()) {
-                            //int dropIndex = row.getIndex();
                             TreeItem droppedOn = row.getTreeItem();
                             if (droppedOn != null && droppedOn.getValue() != null && droppedOn.getValue() instanceof TItem) {
                                 TItem destItem = (TItem)droppedOn.getValue();
@@ -231,4 +232,7 @@ public class CategoryTree extends TreeTableView {
         return value != null && value.getName().toLowerCase().contains(filter.toLowerCase().trim());
     }
 
+    protected void openDialog() {
+
+    }
 }

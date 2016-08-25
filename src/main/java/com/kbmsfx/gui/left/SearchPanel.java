@@ -36,7 +36,7 @@ public class SearchPanel extends HBox {
     @PostConstruct
     public void init() {
         nameTf = new TextField();
-        nameTf.setMinHeight(32);
+        nameTf.setMinHeight(28);
         nameTf.setOnKeyPressed(key -> {
             if (key.getCode().equals(KeyCode.ENTER)) {
                 searchBtn.fire();
